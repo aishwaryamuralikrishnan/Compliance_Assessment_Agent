@@ -278,7 +278,7 @@ export function Guardrails({ r }: { r: EvalReport }) {
         <SetBlock s={e1} table={false}>
           {x ? (
             <>
-              <div className="split">
+              <div className="esplit">
                 <div className="stack">
                   <Stat label="routed right" value={`${x.route_accuracy.right} of ${x.route_accuracy.of}`} sub={`${Math.round((1000 * x.route_accuracy.right) / x.route_accuracy.of) / 10} %`} tone="ok" />
                   <Stat label="fallback decided" value={`${x.fallback.count} of ${x.fallback.of}`} sub={x.fallback.count === 0 ? "the classifier answered every time" : "the classifier did not answer"} />
@@ -470,7 +470,7 @@ export function EndToEnd({ r, print }: { r: EvalReport; print?: boolean }) {
           <div className="theme">
             <div className="eyebrow">The verdict</div>
             <p className="small" style={{ margin: 0, color: "var(--ink-2)" }}>The verdict is the assessment’s bottom line, one of three: <b>Proceed</b> (nothing stands in the way), <b>Proceed with conditions</b> (obligations to fulfil before launch) or <b>Do not build as described</b> (the design is unlawful as it stands). It is right when it equals the one the reviewer expected; a dangerous miss is a Do not build answered with Proceed.</p>
-            <div className="split">
+            <div className="esplit">
               <div className="stack">
                 <Stat label="verdict right" value={`${a.verdict.right} of ${a.verdict.of}`} sub={`target ≥ 0.80 ${met(a.verdict.right / a.verdict.of, 0.8)}`} tone={a.verdict.right / a.verdict.of >= 0.8 ? "ok" : "bad"} />
                 <Stat label="dangerous misses" value={String(a.dangerous_misses.length)} sub={a.dangerous_misses.length ? a.dangerous_misses.join(", ") : "expected Do not build, got Proceed · target 0 met"} tone={a.dangerous_misses.length ? "bad" : "ok"} />

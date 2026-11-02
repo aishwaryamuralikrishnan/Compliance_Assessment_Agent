@@ -380,12 +380,12 @@ table.tbl tr:last-child td { border-bottom: 0; }
 .wd { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; font-size: 12.5px; color: var(--ink-2); }
 .wd > div { display: flex; gap: 10px; align-items: flex-start; background: var(--inset); border: 1px solid var(--line-2); border-radius: 8px; padding: 8px 10px; }
 .wdk { flex: 0 0 auto; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-top: 3px; }
-.split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 16px; align-items: start; }
+.esplit { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 16px; align-items: start; }   /* the report's tiles-beside-figure layout; .split is the review page's */
 .stack { display: flex; flex-direction: column; gap: 12px; }
 .fgrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
 .fcard { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; font-size: 12.5px; }
-@media (max-width: 900px) { .wd, .split, .fgrid { grid-template-columns: 1fr; } }
-@media print { .fgrid { grid-template-columns: repeat(4, minmax(0, 1fr)); } .wd { grid-template-columns: repeat(2, minmax(0, 1fr)); } .split { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); } .fcard, .wd > div { break-inside: avoid; } .tile .v { font-size: 20px; } }
+@media (max-width: 900px) { .wd, .esplit, .fgrid { grid-template-columns: 1fr; } }
+@media print { .fgrid { grid-template-columns: repeat(4, minmax(0, 1fr)); } .wd { grid-template-columns: repeat(2, minmax(0, 1fr)); } .esplit { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); } .fcard, .wd > div { break-inside: avoid; } .tile .v { font-size: 20px; } }
 
 /* legal domains tab (29 Oct): the two bands with the nine areas, the pair tables */
 .lawmap { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px 14px; position: relative; padding: 12px 14px 14px; isolation: isolate; }
