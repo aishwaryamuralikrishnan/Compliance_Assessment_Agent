@@ -24,9 +24,11 @@ COPY eval/harness ./eval/harness
 COPY eval/data ./eval/data
 COPY eval/report/notes.json ./eval/report/notes.json
 COPY eval/__init__.py ./eval/__init__.py
+COPY eval/results ./eval/results
 
-# the EUR-Lex HTML cache and the evaluation results are bind-mounted by docker-compose.yml (data/, eval/results/)
-RUN mkdir -p data/corpus/raw eval/results && useradd --create-home --uid 1000 app && chown -R app:app /app
+# the EUR-Lex HTML cache is bind-mounted by docker-compose.yml (data/); the evaluation results are in the image for the
+# hosted report, and docker-compose.yml mounts the project's eval/results/ over them locally
+RUN mkdir -p data/corpus/raw && useradd --create-home --uid 1000 app && chown -R app:app /app
 USER app
 
 EXPOSE 8000

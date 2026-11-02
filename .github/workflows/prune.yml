@@ -1,0 +1,28 @@
+# Checkpoint retention for the hosted demo (to-do items 1, 13, 28): once a day, remove the saved state of
+# finished conversations older than 30 days from the Neon database. Render's free plan has no cron jobs, so the
+# schedule runs here, against the database directly; Render is not involved. The repository secret
+# DATABASE_URL holds the Neon connection string. "Run workflow" in the Actions tab starts it by hand.
+name: prune finished threads
+
+on:
+  schedule:
+    - cron: "17 3 * * *"        # 03:17 UTC daily
+  workflow_dispatch:
+
+jobs:
+  prune:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: prune threads older than 30 days
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          OPENROUTER_API_KEY: not-needed-for-pruning
+          LANGSMITH_TRACING: "false"
+        run: python scripts/admin.py prune-threads --days 30

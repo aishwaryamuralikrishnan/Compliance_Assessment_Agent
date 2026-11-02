@@ -1,4 +1,4 @@
-# Build context of Dockerfile.api (the project root): keep secrets, caches, the front end and the results out.
+# Build context of Dockerfile.api (the project root): keep secrets, caches, the front end and the docs out; eval/results/ goes in (the hosted report).
 .env
 .env.*
 !.env.example
@@ -13,7 +13,6 @@ venv/
 web/
 docs/
 tests/
-eval/results/
 eval/report/*.pdf
 eval/report/report.json
 data/
