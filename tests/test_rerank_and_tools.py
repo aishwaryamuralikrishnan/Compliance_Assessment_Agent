@@ -107,3 +107,26 @@ def test_get_article_reference_forms(monkeypatch):
     monkeypatch.setattr(TR, "fetch_by_reference", boom)
     text, art = TR.get_article.func("GDPR", "22")
     assert text == "get_article failed: database unavailable" and art == {"error": "database unavailable"}
+
+
+def test_embeddings_carry_the_provider_policy_in_the_request_body(monkeypatch):
+    """The provider block rides in extra_body (the OpenAI SDK merges it into the JSON); a bare keyword is rejected by
+    the SDK, which is how the Neon seed failed on 2 Nov."""
+    from compliance_agent import models
+
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
+    models.embeddings.cache_clear()
+    emb = models.embeddings()
+    params = emb._invocation_params
+    assert "provider" not in params and params["extra_body"]["provider"]["data_collection"] == "deny"
+    seen = {}
+
+    class _Resp:
+        @staticmethod
+        def model_dump():
+            return {"data": [{"embedding": [0.0] * 3, "index": 0}], "usage": None}
+
+    emb.client = type("C", (), {"create": staticmethod(lambda **kw: (seen.update(kw), _Resp())[1])})()
+    emb.embed_documents(["x"])
+    assert seen["extra_body"] == {"provider": {"data_collection": "deny"}}
+    models.embeddings.cache_clear()

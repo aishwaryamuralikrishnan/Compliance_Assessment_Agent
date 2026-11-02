@@ -98,7 +98,7 @@ def embeddings() -> OpenAIEmbeddings:
         dimensions=spec.get("dims"),
         default_headers=_default_headers(),
         check_embedding_ctx_length=False,  # OpenRouter does not accept token-array input
-        model_kwargs={"provider": routing} if routing else {},
+        model_kwargs={"extra_body": {"provider": routing}} if routing else {},   # extra_body: the SDK merges it into the request body
     )
 
 
