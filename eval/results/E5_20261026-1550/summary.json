@@ -1,0 +1,47 @@
+{
+ "header": {
+  "set": "E5",
+  "timestamp": "2026-10-26T14:50:38+00:00",
+  "commit": "6fc8bad",
+  "models": {
+   "worker_full": "openai/gpt-6-luna",
+   "worker_quick": "openai/gpt-6-luna",
+   "cheap": "google/gemini-3.1-flash-lite",
+   "judge": "anthropic/claude-haiku-5.5",
+   "embeddings": "openai/text-embedding-3-small",
+   "reranker": "cohere/rerank-4-fast",
+   "router": "typesafe/jev-router",
+   "grader": "openai/gpt-6-luna"
+  },
+  "database": "localhost/compliance_eval",
+  "host": "LAPTOP-HQB74870"
+ },
+ "cases": 1,
+ "quick_answers": {
+  "count": 1,
+  "of": 1,
+  "not_quick": []
+ },
+ "must_cite_recall": {
+  "found": 1,
+  "of": 1,
+  "misses": []
+ },
+ "invented_citations": {
+  "count": 0,
+  "rows": []
+ },
+ "faithfulness": {
+  "mean": 1.0,
+  "over": 1,
+  "errors": []
+ },
+ "over_three_sentences": [
+  "Q-017"
+ ],
+ "empty": [],
+ "pairs_right": 0,
+ "pairs_total": 0,
+ "pairs_failed": [],
+ "cost": 0.0021
+}

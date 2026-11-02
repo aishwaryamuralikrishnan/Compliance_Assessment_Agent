@@ -1,0 +1,110 @@
+{
+ "header": {
+  "set": "E6",
+  "timestamp": "2026-10-27T15:35:26+00:00",
+  "commit": "6fc8bad",
+  "models": {
+   "worker_full": "openai/gpt-6-luna",
+   "worker_quick": "openai/gpt-6-luna",
+   "cheap": "google/gemini-3.1-flash-lite",
+   "judge": "anthropic/claude-haiku-5.5",
+   "embeddings": "openai/text-embedding-3-small",
+   "reranker": "cohere/rerank-4-fast",
+   "router": "typesafe/jev-router",
+   "grader": "openai/gpt-6-luna"
+  },
+  "database": "localhost/compliance_eval",
+  "host": "LAPTOP-HQB74870"
+ },
+ "cases": 20,
+ "assessed": {
+  "count": 20,
+  "of": 20,
+  "not_assessed": []
+ },
+ "verdict": {
+  "right": 13,
+  "of": 20,
+  "wrong": [
+   "A-001 (Proceed → Proceed with conditions)",
+   "A-008 (Proceed → Proceed with conditions)",
+   "A-009 (Do not build as described → Proceed with conditions)",
+   "A-012 (Proceed with conditions → Do not build as described)",
+   "A-017 (Proceed with conditions → Do not build as described)",
+   "A-019 (Proceed → Proceed with conditions)",
+   "A-020 (Do not build as described → Proceed with conditions)"
+  ]
+ },
+ "dangerous_misses": [],
+ "risk_level": {
+  "right": 13,
+  "of": 20
+ },
+ "flags": {
+  "high_risk_ai": {
+   "missed": 0,
+   "positives": 7,
+   "false": 0,
+   "negatives": 13
+  },
+  "dpia_required": {
+   "missed": 2,
+   "positives": 14,
+   "false": 0,
+   "negatives": 6
+  }
+ },
+ "must_cite": {
+  "found": 37,
+  "of": 39,
+  "misses": [
+   "A-007: GDPR Art. 22",
+   "A-010: AI Act Annex III"
+  ]
+ },
+ "key_findings": {
+  "matched": 59,
+  "partial": 10,
+  "severity_miscalibrated": 7,
+  "of": 81,
+  "judged_cases": 20,
+  "judge_errors": []
+ },
+ "wrong_extras": [
+  "A-001: Finding 2 [Required]: requires checking and updating the notice to describe the strip's purpose and legal basis (GDPR Art. 13(1)), although the organisation facts say the existing notice already covers browsing activity inside the account; this is an obligation marked Required that the facts say is already done (contextual blindness).",
+  "A-010: Finding 1: Blocker invoking GDPR Art. 22 for the threshold hold, although the analyst reviews every hold within two hours, so the decision is not solely automated (false escalation and statutory misapplication)."
+ ],
+ "must_not_violations": [],
+ "faithfulness": {
+  "mean": 0.851,
+  "over": 20
+ },
+ "pairs_right": 5,
+ "pairs_total": 8,
+ "pairs_failed": [
+  "A-007+A-019",
+  "A-008+A-009",
+  "A-012+A-016"
+ ],
+ "run": {
+  "rewrites": 32,
+  "regenerations": 0,
+  "seconds_mean": 75.6
+ },
+ "cost": 0.1298,
+ "judge_cost": 0.1817,
+ "judge_vs_human": {
+  "agreed": 13,
+  "of": 15,
+  "unsure": [
+   "A-002 KF1",
+   "A-004 KF2",
+   "A-004 KF5",
+   "A-005 KF1"
+  ],
+  "disagreed": [
+   "A-003 KF1: human partial, judge matched",
+   "A-003 KF5: human partial, judge matched"
+  ]
+ }
+}

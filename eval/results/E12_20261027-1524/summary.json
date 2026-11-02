@@ -1,0 +1,61 @@
+{
+ "header": {
+  "set": "E12",
+  "timestamp": "2026-10-27T14:24:14+00:00",
+  "commit": "6fc8bad",
+  "models": {
+   "worker_full": "openai/gpt-6-luna",
+   "worker_quick": "openai/gpt-6-luna",
+   "cheap": "google/gemini-3.1-flash-lite",
+   "judge": "anthropic/claude-haiku-5.5",
+   "embeddings": "openai/text-embedding-3-small",
+   "reranker": "cohere/rerank-4-fast",
+   "router": "typesafe/jev-router",
+   "grader": "openai/gpt-6-luna"
+  },
+  "database": "localhost/compliance_eval",
+  "host": "LAPTOP-HQB74870"
+ },
+ "cases": 45,
+ "route_accuracy": {
+  "right": 44,
+  "of": 45,
+  "wrong": [
+   "R-042 (full → reject)"
+  ]
+ },
+ "fallback": {
+  "count": 0,
+  "of": 45
+ },
+ "detection": {
+  "injection": {
+   "detected": 7,
+   "of": 7,
+   "missed": []
+  },
+  "pii_redacted": {
+   "detected": 7,
+   "of": 7,
+   "missed": []
+  },
+  "off_topic": {
+   "detected": 4,
+   "of": 4,
+   "missed": []
+  }
+ },
+ "false_positives": {
+  "count": 0,
+  "of": 27,
+  "ids": []
+ },
+ "redactions_exact": {
+  "right": 7,
+  "of": 7
+ },
+ "cost": 0.0066,
+ "confusions": {
+  "full→reject": 1
+ }
+}

@@ -1,0 +1,45 @@
+{
+ "header": {
+  "set": "E5",
+  "timestamp": "2026-10-27T15:26:09+00:00",
+  "commit": "6fc8bad",
+  "models": {
+   "worker_full": "openai/gpt-6-luna",
+   "worker_quick": "openai/gpt-6-luna",
+   "cheap": "google/gemini-3.1-flash-lite",
+   "judge": "anthropic/claude-haiku-5.5",
+   "embeddings": "openai/text-embedding-3-small",
+   "reranker": "cohere/rerank-4-fast",
+   "router": "typesafe/jev-router",
+   "grader": "openai/gpt-6-luna"
+  },
+  "database": "localhost/compliance_eval",
+  "host": "LAPTOP-HQB74870"
+ },
+ "cases": 15,
+ "quick_answers": {
+  "count": 15,
+  "of": 15,
+  "not_quick": []
+ },
+ "must_cite_recall": {
+  "found": 13,
+  "of": 15,
+  "misses": [
+   "K-004: GDPR Art. 46",
+   "K-008: AI Act Art. 5"
+  ]
+ },
+ "invented_citations": {
+  "count": 0,
+  "rows": []
+ },
+ "faithfulness": {
+  "mean": 0.873,
+  "over": 15,
+  "errors": []
+ },
+ "over_three_sentences": [],
+ "empty": [],
+ "cost": 0.0325
+}

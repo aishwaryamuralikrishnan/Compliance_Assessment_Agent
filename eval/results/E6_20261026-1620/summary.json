@@ -1,0 +1,77 @@
+{
+ "header": {
+  "set": "E6",
+  "timestamp": "2026-10-26T15:20:33+00:00",
+  "commit": "6fc8bad",
+  "models": {
+   "worker_full": "openai/gpt-6-luna",
+   "worker_quick": "openai/gpt-6-luna",
+   "cheap": "google/gemini-3.1-flash-lite",
+   "judge": "anthropic/claude-haiku-5.5",
+   "embeddings": "openai/text-embedding-3-small",
+   "reranker": "cohere/rerank-4-fast",
+   "router": "typesafe/jev-router",
+   "grader": "openai/gpt-6-luna"
+  },
+  "database": "localhost/compliance_eval",
+  "host": "LAPTOP-HQB74870"
+ },
+ "cases": 1,
+ "assessed": {
+  "count": 1,
+  "of": 1,
+  "not_assessed": []
+ },
+ "verdict": {
+  "right": 1,
+  "of": 1,
+  "wrong": []
+ },
+ "dangerous_misses": [],
+ "risk_level": {
+  "right": 1,
+  "of": 1
+ },
+ "flags": {
+  "high_risk_ai": {
+   "missed": 0,
+   "positives": 1,
+   "false": 0,
+   "negatives": 0
+  },
+  "dpia_required": {
+   "missed": 0,
+   "positives": 1,
+   "false": 0,
+   "negatives": 0
+  }
+ },
+ "must_cite": {
+  "found": 3,
+  "of": 3,
+  "misses": []
+ },
+ "key_findings": {
+  "matched": 5,
+  "partial": 0,
+  "of": 5,
+  "judged_cases": 1,
+  "judge_errors": []
+ },
+ "must_not_violations": [],
+ "faithfulness": {
+  "mean": 0.714,
+  "over": 1
+ },
+ "pairs_right": 0,
+ "pairs_total": 0,
+ "pairs_failed": [],
+ "run_mean": {
+  "searches": 8.0,
+  "rewrites": 1.0,
+  "regenerations": 0.0,
+  "seconds": 52.37
+ },
+ "cost": 0.0064,
+ "judge_cost": 0.0104
+}
