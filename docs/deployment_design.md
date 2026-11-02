@@ -56,7 +56,7 @@ decision for a public demo: a Google identity the table does not know is **admit
 rather than refused, and the **DPO role is given by an allowlist of e-mail addresses** (`DPO_EMAILS`, the
 author's address for now). The two seeded accounts keep working, for the showcase and for the containers.
 
-Flow (Authorization Code with PKCE, `authlib`):
+Flow (Authorization Code with PKCE; `requests` for discovery and the code exchange, PyJWT with its crypto extra for the ID token, no new library):
 
 - `GET /api/auth/oidc/start` builds the Google authorisation URL from `OIDC_ISSUER`
   (`https://accounts.google.com`, discovery document) and redirects; state and the PKCE verifier are kept in a
@@ -95,9 +95,9 @@ allowlisted e-mail → dpo; unverified e-mail → 401; `deny` → 403); the exis
   `/evaluation` reads the runs from the image (locally the bind mount still overrides it). `eval/report/evaluation.pdf`
   is not in the image; the page's *Print view* is.
 - `.github/workflows/prune.yml`, the retention schedule.
-- OIDC: `api/oidc.py` (router), `api/sessions.py` (the state cookie), `compliance_agent/db.py` (the two columns,
-  nullable password), `compliance_agent/auth.py` (`user_for_oidc`), `web/app/login/page.tsx` (the button),
-  `requirements.txt` (`authlib`), tests, `.env.example`, `docker-compose.yml` (the OIDC variables passed through).
+- OIDC: `api/oidc.py` (router, state cookie), `compliance_agent/db.py` (the two columns, nullable password),
+  `compliance_agent/auth.py` (`user_for_oidc`), `web/app/login/page.tsx` (the button, shown only when `GET /api/auth/providers` says so),
+  `requirements.txt` (`pyjwt[crypto]`), `tests/test_oidc.py`, `.env.example`, `docker-compose.yml` (the OIDC variables passed through). Built 2 Nov.
 - The notices (item 27): one line on the login page and in the assistant's header, and a public `/privacy`
   page with the recipients (OpenRouter and the model providers as sub-processors under its DPA and SCCs, data
   collection denied, zero data retention where the provider offers it, the reranker excepted), what never

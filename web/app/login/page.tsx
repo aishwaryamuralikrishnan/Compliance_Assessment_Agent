@@ -1,10 +1,20 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import { landing } from "@/lib/nav";
 import type { User } from "@/lib/types";
+
+const OIDC_ERRORS: Record<string, string> = {
+  "state-expired": "The sign-in took too long or the browser lost its place; please try again.",
+  "state-mismatch": "The sign-in did not come back the way it left; please try again.",
+  "token-invalid": "The identity provider's answer could not be verified.",
+  "email-unverified": "The account has no verified e-mail address; a verified address is needed.",
+  "not-invited": "This account is not on the list of users for this installation.",
+  "exchange-failed": "The identity provider refused the sign-in; please try again.",
+  "provider-unreachable": "The identity provider could not be reached; please try again in a moment.",
+};
 
 export default function LoginPage() {
   const router = useRouter();
@@ -12,6 +22,12 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [provider, setProvider] = useState<{ oidc: boolean; name: string | null } | null>(null);
+  useEffect(() => {
+    api.get<{ oidc: boolean; name: string | null }>("/api/auth/providers").then(setProvider).catch(() => setProvider({ oidc: false, name: null }));
+    const e = new URLSearchParams(window.location.search).get("error");   // the OIDC callback redirects here on failure
+    if (e) setError(OIDC_ERRORS[e] || `Sign-in with the identity provider failed (${e}).`);
+  }, []);
 
   async function submit(e: FormEvent) {
     e.preventDefault();
@@ -52,9 +68,15 @@ export default function LoginPage() {
           </label>
           {error ? <div className="error">{error}</div> : null}
           <button className="btn primary" type="submit" disabled={busy || !username || !password} style={{ height: 44, justifyContent: "center", marginTop: 4 }}>Sign in</button>
-          <div className="or"><span />later<span /></div>
-          <button type="button" className="btn" disabled style={{ height: 42, justifyContent: "center" }}>Continue with your organisation (OIDC)</button>
-          <div className="small muted" style={{ marginTop: 6 }}>Two seeded accounts for the demo: <code>lena.k</code> is a product manager, <code>m.weber</code> the data protection officer. The DPO lands on the review queue and has no assistant page.</div>
+          {provider?.oidc ? (
+            <>
+              <div className="or"><span />or<span /></div>
+              <a className="btn" href="/api/auth/oidc/start" style={{ height: 42, justifyContent: "center", textDecoration: "none" }}>Sign in with {provider.name || "your identity provider"}</a>
+              <div className="small muted" style={{ marginTop: 6 }}>A first sign-in creates a product manager account from your verified e-mail address; the DPO role is given by the administrator. Two seeded accounts remain for the demo: <code>lena.k</code> (product manager) and <code>m.weber</code> (DPO).</div>
+            </>
+          ) : (
+            <div className="small muted" style={{ marginTop: 6 }}>Two seeded accounts for the demo: <code>lena.k</code> is a product manager, <code>m.weber</code> the data protection officer. The DPO lands on the review queue and has no assistant page.</div>
+          )}
         </form>
       </div>
     </main>

@@ -5,7 +5,7 @@ Python 3.12 · FastAPI + React (Next.js) · LangGraph + LangChain 1.x · OpenRou
 ## Project layout
 
 ```
-api/                        the web API (FastAPI) over graph.py: auth (JWT cookie), threads, reviews, register, memory, meta, evaluation (the public report); docs/web_app_design.md
+api/                        the web API (FastAPI) over graph.py: auth (JWT cookie), oidc (sign in with Google), threads, reviews, register, memory, meta, evaluation (the public report); docs/web_app_design.md
 web/                        the React (Next.js) front end: login, assistant, review queue, register, memory; the public /evaluation pages; lib/ (API client, hooks), components/ (EvalReport + EvalCharts: the report's sections and inline SVG figures)
 compliance_agent/           the agent package (knows nothing of the UI)
   config.py                 env + YAML loading (OPENROUTER_API_KEY from the environment)
@@ -64,7 +64,7 @@ uvicorn api.main:app --reload --port 8000       # the web API, http://localhost:
 cd web; npm install; npm run dev               # the React front end, http://localhost:3000 (Node.js 20+; proxies /api to :8000)
 ```
 
-Accounts: `lena.k` (product manager), `m.weber` (DPO); passwords from `.env`.
+Accounts: `lena.k` (product manager), `m.weber` (DPO); passwords from `.env`. **Sign in with Google** (`api/oidc.py`, OpenID Connect with PKCE) appears on the login page when `OIDC_CLIENT_ID` is set: a first sign-in creates a product manager from the verified e-mail address, the addresses in `DPO_EMAILS` sign in as DPO, and `OIDC_DEFAULT_ROLE=deny` admits only accounts the table already knows; the role is decided by the `users` table at every sign-in, never by the provider. The callback runs through the front end's `/api` proxy so the session cookie stays first-party; the redirect URI to register is `PUBLIC_BASE_URL` + `/api/auth/oidc/callback` (`docs/deployment_design.md`).
 
 ## Run everything in containers
 
@@ -104,13 +104,13 @@ Setting of 23 Oct 2026 (development; the showcase lines for Mistral Large 4 are 
 ## Tests
 
 ```powershell
-pytest tests -q                                                  # 72 tests, about 2 min (bcrypt and the Postgres round trips)
+pytest tests -q                                                  # 75 tests, about 2 min (bcrypt and the Postgres round trips)
 pytest tests -q --cov=compliance_agent --cov=api --cov-report=term-missing    # with line coverage (pytest-cov, requirements-eval.txt)
 ```
 
 Writing tests run on a scratch database (`compliance_test`, created automatically next to the real one), so the register and memory are never touched by a test run. No test calls a model or the gateway: the worker and the reviser run a scripted model, retrieval, corpus and the input screens are canned (`tests/fakes.py`), and the unit tests of the retrieval loop, the grader, the rewrite, the reranker, the router, the input screen and the memory proposals replace the model call with a stub that answers what the test needs.
 
-Line coverage on 23 Oct 2026: **92 %** of `compliance_agent/` and `api/` (3,178 statements, 257 missed) on a machine with the seeded corpus, 89 % without it (the three database tests of `tests/test_retrieval.py` then skip), up from 82 % with the 41 tests before to-do item 4. What the tests cover, by file: `tests/test_graph.py` the graph's flows (reject, full assessment through the DPO's three decisions, the revision loop, the guardrail's rules, retention, tracing tags, the live-graph layout); `tests/test_api.py` the web API through HTTP including the event stream and its replay; `tests/test_api_edges.py` its refusals and error reports (busy or paused thread, a run that raises, a view the stream cannot serialise, forged and expired cookies); `tests/test_quick_path.py` the quick path (a question routed `quick`, the empty answer reported rather than hidden, a preference note on a quick thread); `tests/test_retrieval_loop.py` every branch of the agentic RAG loop and the grader's decision rule; `tests/test_rerank_and_tools.py` the reranker's three paths and the tools' own refusals; `tests/test_screens_and_memory.py` the input screen, the router's fallback order, the memory proposals and the role-gated store write; `tests/test_retrieval.py` identifiers and rank fusion (its database tests need a seeded corpus and are skipped otherwise); `tests/test_chunker.py` and `tests/test_seed_offline.py` the ingestion. The one file still below 80 %: `tracing.py` (74 %: the LangSmith branches, off in the tests); `retrieval/search.py` is at 98 % with the seeded corpus and 47 % without, because the SQL of the hybrid search runs only against it. Coverage measures the code, not the agent's output quality, which is EVALUATION.md.
+Line coverage on 23 Oct 2026: **92 %** of `compliance_agent/` and `api/` (3,178 statements, 257 missed) on a machine with the seeded corpus, 89 % without it (the three database tests of `tests/test_retrieval.py` then skip), up from 82 % with the 41 tests before to-do item 4. What the tests cover, by file: `tests/test_graph.py` the graph's flows (reject, full assessment through the DPO's three decisions, the revision loop, the guardrail's rules, retention, tracing tags, the live-graph layout); `tests/test_api.py` the web API through HTTP including the event stream and its replay; `tests/test_api_edges.py` its refusals and error reports (busy or paused thread, a run that raises, a view the stream cannot serialise, forged and expired cookies); `tests/test_oidc.py` the Google sign-in with the provider stubbed (first sign-in, the DPO allowlist, refusals, invitation-only mode); `tests/test_quick_path.py` the quick path (a question routed `quick`, the empty answer reported rather than hidden, a preference note on a quick thread); `tests/test_retrieval_loop.py` every branch of the agentic RAG loop and the grader's decision rule; `tests/test_rerank_and_tools.py` the reranker's three paths and the tools' own refusals; `tests/test_screens_and_memory.py` the input screen, the router's fallback order, the memory proposals and the role-gated store write; `tests/test_retrieval.py` identifiers and rank fusion (its database tests need a seeded corpus and are skipped otherwise); `tests/test_chunker.py` and `tests/test_seed_offline.py` the ingestion. The one file still below 80 %: `tracing.py` (74 %: the LangSmith branches, off in the tests); `retrieval/search.py` is at 98 % with the seeded corpus and 47 % without, because the SQL of the hybrid search runs only against it. Coverage measures the code, not the agent's output quality, which is EVALUATION.md.
 
 ## Conventions
 

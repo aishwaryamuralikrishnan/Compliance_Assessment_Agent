@@ -53,6 +53,13 @@ services:
       LANGSMITH_TRACING: ${LANGSMITH_TRACING:-false}
       LANGSMITH_API_KEY: ${LANGSMITH_API_KEY:-}
       LANGSMITH_PROJECT: ${LANGSMITH_PROJECT:-compliance-assistant}
+      # Sign in with Google (api/oidc.py); leave OIDC_CLIENT_ID empty and the login page shows the password form only
+      OIDC_ISSUER: ${OIDC_ISSUER:-https://accounts.google.com}
+      OIDC_CLIENT_ID: ${OIDC_CLIENT_ID:-}
+      OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET:-}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://localhost:3000}
+      DPO_EMAILS: ${DPO_EMAILS:-}
+      OIDC_DEFAULT_ROLE: ${OIDC_DEFAULT_ROLE:-product_manager}
     ports:
       - "8000:8000"                      # http://localhost:8000/docs
     volumes:

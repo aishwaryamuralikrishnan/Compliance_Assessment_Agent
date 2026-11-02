@@ -110,6 +110,11 @@ CREATE TABLE IF NOT EXISTS users (
     created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- OIDC sign-in (2 Nov): a Google identity maps to a users row by subject or verified e-mail; such a row has no password
+ALTER TABLE users ADD COLUMN IF NOT EXISTS email TEXT UNIQUE;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS oidc_subject TEXT UNIQUE;
+ALTER TABLE users ALTER COLUMN password_hash DROP NOT NULL;
+
 CREATE TABLE IF NOT EXISTS legal_chunks (
     id             SERIAL PRIMARY KEY,
     chunk_key      TEXT UNIQUE NOT NULL,         -- e.g. GDPR:art22:p1, AI_ACT:rec71, AI_ACT:anxIII:5

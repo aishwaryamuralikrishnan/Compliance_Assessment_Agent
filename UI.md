@@ -49,6 +49,6 @@ While a run streams, the page shows a progress card in place of the result: a ho
 
 ## Login
 
-The login page states what the app does (an article-cited first assessment of a feature against the GDPR and the EU AI Act, every citation checked against the law's text, the DPO's approval before anything is recorded) and takes the user name and password of one of the two seeded accounts. The session is a signed cookie that lasts eight hours; OIDC login is designed (design note, section 6) and planned with the deployment.
+The login page states what the app does (an article-cited first assessment of a feature against the GDPR and the EU AI Act, every citation checked against the law's text, the DPO's approval before anything is recorded) and takes the user name and password of one of the two seeded accounts, or, when the deployment has a Google client configured, a **Sign in with Google** button under the form (OpenID Connect; built 2 Nov, `docs/deployment_design.md`): a first sign-in creates a product manager account from the verified e-mail address, the addresses on the administrator's allowlist sign in as DPO, and a refused sign-in comes back to this page with the reason in plain words. The session is a signed cookie that lasts eight hours in both cases.
 
 ![Login](docs/images/web_login.png)
