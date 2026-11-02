@@ -1,0 +1,37 @@
+---
+config:
+  flowchart:
+    curve: linear
+---
+graph TD;
+	__start__([<p>__start__</p>]):::first
+	validate_input("validate_input")
+	route("route")
+	direct_answer("direct_answer")
+	worker("worker")
+	reviser("reviser")
+	reject("reject")
+	output_guardrail("output_guardrail")
+	memory_write("memory_write")
+	pm_revision("pm_revision")
+	__end__([<p>__end__</p>]):::last
+	__start__ --> validate_input;
+	direct_answer --> output_guardrail;
+	memory_write -.-> __end__;
+	memory_write -.-> pm_revision;
+	output_guardrail -.-> __end__;
+	output_guardrail -.-> memory_write;
+	output_guardrail -.-> reviser;
+	output_guardrail -.-> worker;
+	pm_revision -.-> reviser;
+	reviser --> output_guardrail;
+	route -.-> direct_answer;
+	route -.-> reject;
+	route -.-> worker;
+	validate_input --> route;
+	worker --> output_guardrail;
+	reject --> __end__;
+	pm_revision -.-> pm_revision;
+	classDef default fill:#f2f0ff,line-height:1.2
+	classDef first fill-opacity:0
+	classDef last fill:#bfb6fc

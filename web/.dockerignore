@@ -1,0 +1,6 @@
+# Build context of web/Dockerfile.
+node_modules
+.next
+npm-debug.log*
+*.tsbuildinfo
+README.md

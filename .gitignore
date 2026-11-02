@@ -1,0 +1,13 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+.streamlit/secrets.toml
+data/corpus/raw/
+*.log
+web/node_modules/
+web/.next/
+web/next-env.d.ts
+web/*.tsbuildinfo

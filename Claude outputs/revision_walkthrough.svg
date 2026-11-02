@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 820" width="1060" height="820" font-family="Helvetica, Arial, sans-serif" font-size="13">
+  <style>
+    .lane{fill:#ffffff;stroke:#d1d5db;stroke-width:1}
+    .lt{fill:#374151;font-weight:700;font-size:14px}
+    .box{fill:#ffffff;stroke:#374151;stroke-width:1.4}
+    .pm{fill:#e8f0f7}.sys{fill:#f3f4f6}.dpo{fill:#f3ecdf}.rec{fill:#eaf2e9}.wait{fill:#fff7e6;stroke:#b45309;stroke-dasharray:5 3}
+    .t{fill:#1f2937}.b{font-weight:700}.s{fill:#6b7280;font-size:11px}
+    .e{fill:none;stroke:#374151;stroke-width:1.6;marker-end:url(#a)}
+    .eg{fill:none;stroke:#15803d;stroke-width:1.8;marker-end:url(#ag)}
+    .eo{fill:none;stroke:#b45309;stroke-width:1.8;marker-end:url(#ao)}
+    .num{fill:#1d4ed8;font-weight:700;font-size:12px}
+    .el{fill:#374151;font-size:11px}
+  </style>
+  <defs>
+    <marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 z" fill="#374151"/></marker>
+    <marker id="ag" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 z" fill="#15803d"/></marker>
+    <marker id="ao" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 z" fill="#b45309"/></marker>
+  </defs>
+  <rect width="1060" height="820" fill="#f4f5f8"/>
+  <text x="20" y="28" class="lt" font-size="16">The revision loop, step by step (one conversation = one thread, from v1 to the register entry)</text>
+
+  <!-- lanes -->
+  <rect x="20" y="45" width="300" height="760" class="lane"/>
+  <rect x="330" y="45" width="400" height="760" class="lane"/>
+  <rect x="740" y="45" width="300" height="760" class="lane"/>
+  <text x="170" y="68" text-anchor="middle" class="lt">Product manager (lena.k)</text>
+  <text x="530" y="68" text-anchor="middle" class="lt">The assistant (the graph, same thread)</text>
+  <text x="890" y="68" text-anchor="middle" class="lt">DPO (m.weber)</text>
+
+  <!-- 1: PM describes -->
+  <rect x="40" y="90" width="260" height="56" rx="8" class="box pm"/>
+  <text x="50" y="110" class="num">1</text>
+  <text x="182" y="112" text-anchor="middle" class="t b">Describes the feature</text>
+  <text x="170" y="131" text-anchor="middle" class="s">"…late-payment warning using browsing data…"</text>
+
+  <!-- 2: worker v1 -->
+  <rect x="350" y="90" width="360" height="86" rx="8" class="box sys"/>
+  <text x="360" y="110" class="num">2</text>
+  <text x="545" y="112" text-anchor="middle" class="t b">worker writes assessment v1 (A-0041)</text>
+  <text x="530" y="131" text-anchor="middle" class="s">route = full · searches the law · structured Assessment</text>
+  <text x="530" y="148" text-anchor="middle" class="s">guardrail: citations verified, stored as draft, shown to the PM</text>
+  <text x="530" y="165" text-anchor="middle" class="s">then request_dpo_review → review task created → thread PAUSES</text>
+  <path d="M300,118 L350,118" class="e"/>
+
+  <!-- 3: DPO request changes -->
+  <rect x="760" y="90" width="260" height="86" rx="8" class="box dpo"/>
+  <text x="770" y="110" class="num">3</text>
+  <text x="900" y="112" text-anchor="middle" class="t b">Review queue: reads v1</text>
+  <text x="890" y="131" text-anchor="middle" class="s">presses Request changes with the list</text>
+  <text x="890" y="148" text-anchor="middle" class="s">"Drop the browsing data"</text>
+  <text x="890" y="165" text-anchor="middle" class="s">(one requested change per line)</text>
+  <path d="M710,133 L760,133" class="e"/>
+
+  <!-- 4: resume under DPO -->
+  <rect x="350" y="205" width="360" height="86" rx="8" class="box sys"/>
+  <text x="360" y="225" class="num">4</text>
+  <text x="545" y="227" text-anchor="middle" class="t b">Paused thread resumes as the DPO</text>
+  <text x="530" y="246" text-anchor="middle" class="s">tool gate: v1 → status "changes requested", nothing recorded,</text>
+  <text x="530" y="263" text-anchor="middle" class="s">lesson "DPO requires: no browsing data" stored in memory</text>
+  <text x="530" y="280" text-anchor="middle" class="s">worker reports the outcome → guardrail → memory_write → END</text>
+  <path d="M890,176 L890,190 L530,190 L530,205" class="e"/>
+
+  <!-- 5: PM sees requests, revises -->
+  <rect x="40" y="320" width="260" height="104" rx="8" class="box pm"/>
+  <text x="50" y="340" class="num">5</text>
+  <text x="182" y="342" text-anchor="middle" class="t b">Assistant page shows the request</text>
+  <text x="170" y="361" text-anchor="middle" class="s">under v1: "Requested changes: drop browsing data"</text>
+  <text x="170" y="378" text-anchor="middle" class="s">per change: done ○ / not possible ○ + note</text>
+  <text x="170" y="395" text-anchor="middle" class="s">text box reopens with the old description;</text>
+  <text x="170" y="412" text-anchor="middle" class="s">she edits it and presses Run revision</text>
+  <path d="M530,291 L530,305 L170,305 L170,320" class="e"/>
+
+  <!-- 6: route revise + reviser -->
+  <rect x="350" y="450" width="360" height="124" rx="8" class="box sys"/>
+  <text x="360" y="470" class="num">6</text>
+  <text x="545" y="472" text-anchor="middle" class="t b">route sees "v1 has changes requested" → revise</text>
+  <text x="530" y="491" text-anchor="middle" class="s">no classifier call; the reviser agent runs instead of the worker</text>
+  <text x="530" y="508" text-anchor="middle" class="s">brief: v1, the DPO's list, PM's answers, old + new description</text>
+  <text x="530" y="525" text-anchor="middle" class="s">searches the law only for what changed; copies untouched findings</text>
+  <text x="530" y="542" text-anchor="middle" class="s">→ Assessment v2 (A-0042): revises A-0041 + "Changes since v1"</text>
+  <text x="530" y="559" text-anchor="middle" class="s">(closed / narrowed / kept / new, one entry per requested change)</text>
+  <path d="M170,424 L170,438 L530,438 L530,450" class="e"/>
+
+  <!-- 7: guardrail v2 -->
+  <rect x="350" y="600" width="360" height="86" rx="8" class="box sys"/>
+  <text x="360" y="620" class="num">7</text>
+  <text x="545" y="622" text-anchor="middle" class="t b">guardrail checks v2, plus two rules</text>
+  <text x="530" y="641" text-anchor="middle" class="s">"Changes since v1" required; "not possible" + Proceed refused</text>
+  <text x="530" y="658" text-anchor="middle" class="s">(one regeneration) · stored as draft, shown to the PM with v2 on top</text>
+  <text x="530" y="675" text-anchor="middle" class="s">then request_dpo_review → review task → thread PAUSES again</text>
+  <path d="M530,574 L530,600" class="e"/>
+
+  <!-- 8: DPO decides on v2 -->
+  <rect x="760" y="600" width="260" height="86" rx="8" class="box dpo"/>
+  <text x="770" y="620" class="num">8</text>
+  <text x="900" y="622" text-anchor="middle" class="t b">Review queue: v2 arrives</text>
+  <text x="890" y="641" text-anchor="middle" class="s">"Changes since v1" above the findings,</text>
+  <text x="890" y="658" text-anchor="middle" class="s">v1 and the requested changes in an expander</text>
+  <text x="890" y="675" text-anchor="middle" class="s">Approve and record / Request changes / Reject</text>
+  <path d="M710,643 L760,643" class="e"/>
+
+  <!-- 9: register -->
+  <rect x="760" y="720" width="260" height="70" rx="8" class="box rec"/>
+  <text x="770" y="740" class="num">9</text>
+  <text x="900" y="742" text-anchor="middle" class="t b">Approve → register entry for v2</text>
+  <text x="890" y="761" text-anchor="middle" class="s">written by the gate under the DPO's name;</text>
+  <text x="890" y="778" text-anchor="middle" class="s">the entry shows its history: v1 → request → v2</text>
+  <path d="M890,686 L890,720" class="eg"/>
+  <text x="900" y="708" class="el" fill="#15803d">approve</text>
+
+  <!-- loop back -->
+  <path d="M1020,643 L1035,643 L1035,300 L745,300 L745,248 L712,248" class="eo"/>
+  <text x="820" y="294" class="el" fill="#b45309">Request changes again → step 4, v3 next time</text>
+
+  <!-- PM waits -->
+  <rect x="40" y="200" width="260" height="40" rx="8" class="box wait"/>
+  <text x="170" y="224" text-anchor="middle" class="s">PM's page: "Sent to the DPO automatically" · polling</text>
+  <rect x="40" y="620" width="260" height="40" rx="8" class="box wait"/>
+  <text x="170" y="644" text-anchor="middle" class="s">PM's page: v2 shown, "Sent to the DPO" · polling</text>
+  <path d="M350,660 L300,660" class="e"/>
+</svg>

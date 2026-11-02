@@ -1,0 +1,109 @@
+---
+config:
+  flowchart:
+    curve: linear
+---
+graph TD;
+	__start__([<p>__start__</p>]):::first
+	validate_input("validate_input")
+	route("route")
+	direct_answer("direct_answer")
+	reject("reject")
+	output_guardrail("output_guardrail")
+	memory_write("memory_write")
+	pm_revision("pm_revision")
+	__end__([<p>__end__</p>]):::last
+	__start__ --> validate_input;
+	direct_answer --> output_guardrail;
+	memory_write -.-> __end__;
+	memory_write -.-> pm_revision;
+	output_guardrail -.-> __end__;
+	output_guardrail -.-> memory_write;
+	output_guardrail -.-> reviser____start__;
+	output_guardrail -.-> worker____start__;
+	pm_revision -.-> reviser____start__;
+	reviser____end__ --> output_guardrail;
+	route -.-> direct_answer;
+	route -.-> reject;
+	route -.-> worker____start__;
+	validate_input --> route;
+	worker____end__ --> output_guardrail;
+	reject --> __end__;
+	pm_revision -.-> pm_revision;
+	subgraph worker
+	worker____start__(<p>__start__</p>)
+	worker__model("model")
+	worker__tools("tools")
+	worker__PIIMiddleware_email__before_model("PIIMiddleware[email].before_model")
+	worker__PIIMiddleware_email__after_model("PIIMiddleware[email].after_model")
+	worker__PIIMiddleware_credit_card__before_model("PIIMiddleware[credit_card].before_model")
+	worker__PIIMiddleware_credit_card__after_model("PIIMiddleware[credit_card].after_model")
+	worker__PIIMiddleware_ip__before_model("PIIMiddleware[ip].before_model")
+	worker__PIIMiddleware_ip__after_model("PIIMiddleware[ip].after_model")
+	worker__PIIMiddleware_phone__before_model("PIIMiddleware[phone].before_model")
+	worker__PIIMiddleware_phone__after_model("PIIMiddleware[phone].after_model")
+	worker__TracedSummarizationMiddleware_before_model("TracedSummarizationMiddleware.before_model")
+	worker__ToolCallLimitMiddleware_after_model("ToolCallLimitMiddleware.after_model")
+	worker____end__(<p>__end__</p>)
+	worker__PIIMiddleware_credit_card__after_model --> worker__PIIMiddleware_email__after_model;
+	worker__PIIMiddleware_credit_card__before_model -.-> worker__PIIMiddleware_ip__before_model;
+	worker__PIIMiddleware_credit_card__before_model -.-> worker____end__;
+	worker__PIIMiddleware_email__after_model -.-> worker__PIIMiddleware_email__before_model;
+	worker__PIIMiddleware_email__after_model -.-> worker____end__;
+	worker__PIIMiddleware_email__after_model -.-> worker__tools;
+	worker__PIIMiddleware_email__before_model -.-> worker__PIIMiddleware_credit_card__before_model;
+	worker__PIIMiddleware_email__before_model -.-> worker____end__;
+	worker__PIIMiddleware_ip__after_model --> worker__PIIMiddleware_credit_card__after_model;
+	worker__PIIMiddleware_ip__before_model -.-> worker__PIIMiddleware_phone__before_model;
+	worker__PIIMiddleware_ip__before_model -.-> worker____end__;
+	worker__PIIMiddleware_phone__after_model --> worker__PIIMiddleware_ip__after_model;
+	worker__PIIMiddleware_phone__before_model -.-> worker__TracedSummarizationMiddleware_before_model;
+	worker__PIIMiddleware_phone__before_model -.-> worker____end__;
+	worker__ToolCallLimitMiddleware_after_model -.-> worker__PIIMiddleware_phone__after_model;
+	worker__ToolCallLimitMiddleware_after_model -.-> worker____end__;
+	worker__TracedSummarizationMiddleware_before_model --> worker__model;
+	worker____start__ --> worker__PIIMiddleware_email__before_model;
+	worker__model --> worker__ToolCallLimitMiddleware_after_model;
+	worker__tools -.-> worker__PIIMiddleware_email__before_model;
+	worker__tools -.-> worker____end__;
+	end
+	subgraph reviser
+	reviser____start__(<p>__start__</p>)
+	reviser__model("model")
+	reviser__tools("tools")
+	reviser__PIIMiddleware_email__before_model("PIIMiddleware[email].before_model")
+	reviser__PIIMiddleware_email__after_model("PIIMiddleware[email].after_model")
+	reviser__PIIMiddleware_credit_card__before_model("PIIMiddleware[credit_card].before_model")
+	reviser__PIIMiddleware_credit_card__after_model("PIIMiddleware[credit_card].after_model")
+	reviser__PIIMiddleware_ip__before_model("PIIMiddleware[ip].before_model")
+	reviser__PIIMiddleware_ip__after_model("PIIMiddleware[ip].after_model")
+	reviser__PIIMiddleware_phone__before_model("PIIMiddleware[phone].before_model")
+	reviser__PIIMiddleware_phone__after_model("PIIMiddleware[phone].after_model")
+	reviser__TracedSummarizationMiddleware_before_model("TracedSummarizationMiddleware.before_model")
+	reviser__ToolCallLimitMiddleware_after_model("ToolCallLimitMiddleware.after_model")
+	reviser____end__(<p>__end__</p>)
+	reviser__PIIMiddleware_credit_card__after_model --> reviser__PIIMiddleware_email__after_model;
+	reviser__PIIMiddleware_credit_card__before_model -.-> reviser__PIIMiddleware_ip__before_model;
+	reviser__PIIMiddleware_credit_card__before_model -.-> reviser____end__;
+	reviser__PIIMiddleware_email__after_model -.-> reviser__PIIMiddleware_email__before_model;
+	reviser__PIIMiddleware_email__after_model -.-> reviser____end__;
+	reviser__PIIMiddleware_email__after_model -.-> reviser__tools;
+	reviser__PIIMiddleware_email__before_model -.-> reviser__PIIMiddleware_credit_card__before_model;
+	reviser__PIIMiddleware_email__before_model -.-> reviser____end__;
+	reviser__PIIMiddleware_ip__after_model --> reviser__PIIMiddleware_credit_card__after_model;
+	reviser__PIIMiddleware_ip__before_model -.-> reviser__PIIMiddleware_phone__before_model;
+	reviser__PIIMiddleware_ip__before_model -.-> reviser____end__;
+	reviser__PIIMiddleware_phone__after_model --> reviser__PIIMiddleware_ip__after_model;
+	reviser__PIIMiddleware_phone__before_model -.-> reviser__TracedSummarizationMiddleware_before_model;
+	reviser__PIIMiddleware_phone__before_model -.-> reviser____end__;
+	reviser__ToolCallLimitMiddleware_after_model -.-> reviser__PIIMiddleware_phone__after_model;
+	reviser__ToolCallLimitMiddleware_after_model -.-> reviser____end__;
+	reviser__TracedSummarizationMiddleware_before_model --> reviser__model;
+	reviser____start__ --> reviser__PIIMiddleware_email__before_model;
+	reviser__model --> reviser__ToolCallLimitMiddleware_after_model;
+	reviser__tools -.-> reviser__PIIMiddleware_email__before_model;
+	reviser__tools -.-> reviser____end__;
+	end
+	classDef default fill:#f2f0ff,line-height:1.2
+	classDef first fill-opacity:0
+	classDef last fill:#bfb6fc

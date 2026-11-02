@@ -1,0 +1,21 @@
+# Build context of Dockerfile.api (the project root): keep secrets, caches, the front end and the results out.
+.env
+.env.*
+!.env.example
+.git
+.gitignore
+__pycache__/
+**/__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+web/
+docs/
+tests/
+eval/results/
+eval/report/*.pdf
+eval/report/report.json
+data/
+*.log
+*.md

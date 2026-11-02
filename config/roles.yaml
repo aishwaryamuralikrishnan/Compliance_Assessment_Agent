@@ -1,0 +1,42 @@
+# Permission matrix: who may call what. Read by auth.py (tool binding) and by the
+# tool_gate node (re-checked on every call: defence in depth).
+#
+# kind:  read   -> read-only, cheap, bound for every role that lists it
+#        write  -> creates a review task, then interrupt() until the DPO decides
+#        ui     -> not a worker tool; the API endpoint behind the page's button checks the role directly
+#
+# Nothing here writes the processing register. The entry is written by the tool gate when
+# the DPO approves a paused request_dpo_review call, under the DPO's identity from
+# config["configurable"] (separation of duties: the requester and the approver are different
+# roles, and no worker call can record anything).
+
+tools:
+  search_regulation:  {kind: read}
+  get_article:        {kind: read}
+  lookup_register:    {kind: read}
+  request_dpo_review: {kind: write, pauses: true}   # called automatically after every verified assessment
+  export_register:    {kind: ui}
+
+roles:
+  product_manager:
+    description: Ask questions and request assessments; every assessment goes to the DPO for review.
+    allowed:
+      - search_regulation
+      - get_article
+      - lookup_register
+      - request_dpo_review
+    denied_message:
+      record_in_register: "Only the DPO's approval records an assessment in the processing register; the review request is sent automatically."
+
+  dpo:
+    description: Review, amend, approve or reject assessments; export the register. The DPO does not generate assessments.
+    allowed:
+      - search_regulation
+      - get_article
+      - lookup_register
+      - export_register
+
+# Memory write policy (memory.py): which role's actions may write which Store namespace.
+memory_writes:
+  product_manager: [user_prefs]
+  dpo: [user_prefs, org_facts, org_lessons]

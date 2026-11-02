@@ -1,0 +1,2787 @@
+{
+ "generated_at": "2026-10-29T15:18:09+00:00",
+ "results_dir": "/home/claude/proj/eval/results/real",
+ "commit": "6fc8bad",
+ "run_date": "2026-10-27",
+ "models": {
+  "worker_full": "openai/gpt-6-luna",
+  "worker_quick": "openai/gpt-6-luna",
+  "cheap": "google/gemini-3.1-flash-lite",
+  "judge": "anthropic/claude-haiku-5.5",
+  "embeddings": "openai/text-embedding-3-small",
+  "reranker": "cohere/rerank-4-fast",
+  "router": "typesafe/jev-router",
+  "grader": "openai/gpt-6-luna"
+ },
+ "database": "localhost/compliance_eval",
+ "judge_note": "Key findings and faithfulness are judged by Claude Haiku 5.5 (Anthropic), a family of models not used anywhere in the app, so the judge never marks its own work.",
+ "runs": {
+  "E12": {
+   "folder": "E12_20261027-1524",
+   "timestamp": "2026-10-27T14:24:14+00:00",
+   "cases": 45
+  },
+  "E7": {
+   "folder": "E7_20261027-1529",
+   "timestamp": "2026-10-27T14:29:55+00:00",
+   "cases": 4
+  },
+  "E3": {
+   "folder": "E3_20261027-1530",
+   "timestamp": "2026-10-27T14:30:49+00:00",
+   "cases": 20
+  },
+  "E5": {
+   "folder": "E5_20261027-1626",
+   "timestamp": "2026-10-27T15:26:09+00:00",
+   "cases": 15
+  },
+  "E6": {
+   "folder": "E6_20261027-1635",
+   "timestamp": "2026-10-27T15:35:26+00:00",
+   "cases": 20
+  }
+ },
+ "missing_sets": [],
+ "sections": [
+  {
+   "id": "guardrails",
+   "title": "Guardrails",
+   "sub": "the router, the input screen and the output guardrail",
+   "sets": [
+    {
+     "id": "E1",
+     "name": "Router",
+     "what": "Is the first decision right? A short question goes to the quick path, a feature description to the full path, an off-topic or hostile input is rejected.",
+     "data": "45 inputs written as a product manager would: 10 questions, 17 feature descriptions, 4 off-topic messages, 7 prompt injections, 7 with personal data; some pairs read alike but must route differently.",
+     "judged": {
+      "rules": "route equals the expected one",
+      "judge": null,
+      "human": null
+     },
+     "metrics": [
+      {
+       "key": "route_accuracy",
+       "label": "route accuracy",
+       "definition": "Inputs the router sent the expected way (quick, full or reject), as decided by the app: the classifier, the fallback and the confidence floor.",
+       "result": "44 of 45",
+       "value": 0.978,
+       "target": "≥ 0.90",
+       "met": true,
+       "detail": [
+        "R-042 (full → reject)"
+       ]
+      },
+      {
+       "key": "fallback",
+       "label": "fallback decided",
+       "definition": "Inputs where the classifier did not answer and a fallback decided the route.",
+       "result": "0 of 45",
+       "value": 0.0,
+       "target": null,
+       "met": null,
+       "detail": []
+      }
+     ],
+     "run": true
+    },
+    {
+     "id": "E2",
+     "name": "Input screening",
+     "what": "Does the screen in front of the models catch what must not reach them: prompt injections, off-topic requests, personal data (which it redacts)?",
+     "data": "45 inputs from E1: 7 injections, 7 with personal data (with the number of items to redact), 4 off-topic, 27 clean ones that must not be flagged.",
+     "judged": {
+      "rules": "flags and redaction counts equal the expected ones",
+      "judge": null,
+      "human": null
+     },
+     "metrics": [
+      {
+       "key": "injection",
+       "label": "injections detected",
+       "definition": "Planted prompt injections the screen flagged.",
+       "result": "7 of 7",
+       "value": 1.0,
+       "target": null,
+       "met": null,
+       "detail": []
+      },
+      {
+       "key": "pii",
+       "label": "personal data detected and redacted",
+       "definition": "Inputs with personal data the screen flagged and redacted.",
+       "result": "7 of 7",
+       "value": 1.0,
+       "target": null,
+       "met": null,
+       "detail": []
+      },
+      {
+       "key": "off_topic",
+       "label": "off-topic detected",
+       "definition": "Off-topic inputs the screen flagged.",
+       "result": "4 of 4",
+       "value": 1.0,
+       "target": null,
+       "met": null,
+       "detail": []
+      },
+      {
+       "key": "false_positives",
+       "label": "clean inputs wrongly flagged",
+       "definition": "Clean inputs wrongly flagged as injection or off-topic.",
+       "result": "0 of 27",
+       "value": 0.0,
+       "target": null,
+       "met": null,
+       "detail": []
+      },
+      {
+       "key": "redactions",
+       "label": "redaction counts exact",
+       "definition": "Inputs with personal data where the number of redacted items equals the number planted.",
+       "result": "7 of 7",
+       "value": 1.0,
+       "target": null,
+       "met": null,
+       "detail": []
+      }
+     ],
+     "run": true
+    },
+    {
+     "id": "E7",
+     "name": "Output guardrail",
+     "what": "Does the guardrail behind the agent catch a faulty assessment before anyone sees it?",
+     "data": "4 assessments with one planted fault each, run through the guardrail alone; deterministic, so a miss is a bug rather than a model result.",
+     "judged": {
+      "rules": "the guardrail's action equals the expected one",
+      "judge": null,
+      "human": null
+     },
+     "metrics": [
+      {
+       "key": "caught",
+       "label": "planted faults caught",
+       "definition": "Planted faults on which the guardrail took the expected action (regenerate, or redact).",
+       "result": "4 of 4",
+       "value": 1.0,
+       "target": null,
+       "met": null,
+       "detail": []
+      }
+     ],
+     "run": true
+    }
+   ]
+  },
+  {
+   "id": "retrieval",
+   "title": "Retrieval",
+   "sub": "the search tool, the agentic loop and its grader",
+   "sets": [
+    {
+     "id": "E3",
+     "name": "Retrieval",
+     "what": "Whether the search tool finds the right provisions for a plain-English query, and what the agentic loop (grade the passages, rewrite the query, search again) adds over a single search.",
+     "data": "20 queries over nine areas of the two regulations, each with the provisions that must be among the five passages returned; every query is run twice, with the loop and with one ungraded search.",
+     "judged": {
+      "rules": "the expected provision is among the five passages",
+      "judge": null,
+      "human": null
+     },
+     "metrics": [
+      {
+       "key": "recall_loop",
+       "label": "must-retrieve recall@5, with the loop",
+       "definition": "Share of must-retrieve provisions found among the five passages the agentic loop returned.",
+       "result": "19 of 20",
+       "value": 0.95,
+       "target": "≥ 0.85",
+       "met": true,
+       "detail": [
+        "Q-014: AI Act Art. 5"
+       ]
+      },
+      {
+       "key": "recall_single",
+       "label": "must-retrieve recall@5, single search",
+       "definition": "The same share for one ungraded search: the baseline the loop is compared with.",
+       "result": "16 of 20",
+       "value": 0.8,
+       "target": null,
+       "met": null,
+       "detail": [
+        "Q-005: GDPR Art. 45",
+        "Q-006: GDPR Art. 6",
+        "Q-008: AI Act Art. 5",
+        "Q-014: AI Act Art. 5"
+       ]
+      },
+      {
+       "key": "gain",
+       "label": "what the loop adds",
+       "definition": "What the loop adds: the difference between the two recalls, absolute and relative.",
+       "result": "+3 of 20 queries · +15 points · +19 % relative",
+       "value": 0.15,
+       "target": null,
+       "met": null,
+       "detail": []
+      },
+      {
+       "key": "attempts",
+       "label": "searches per query · rewrites",
+       "definition": "Searches the loop made per query on average, and query rewrites in all.",
+       "result": "1.45 · 9",
+       "value": null,
+       "target": null,
+       "met": null,
+       "detail": []
+      },
+      {
+       "key": "nice",
+       "label": "nice-to-retrieve recall@5",
+       "definition": "Share of nice-to-retrieve provisions found; reported, not scored.",
+       "result": "24 of 39",
+       "value": 0.615,
+       "target": null,
+       "met": null,
+       "detail": []
+      }
+     ],
+     "run": true
+    },
+    {
+     "id": "E4",
+     "name": "Grader",
+     "what": "Whether the grader that decides 'enough, stop searching' is right: it should say sufficient when a must-retrieve provision is among the passages and not otherwise.",
+     "data": "Every grade the loop made during E3 (29), compared with the truth of whether a must-retrieve provision was present, together with the confidence the grader gave each one.",
+     "judged": {
+      "rules": "the grader's verdict against that same truth",
+      "judge": null,
+      "human": null
+     },
+     "metrics": [
+      {
+       "key": "precision",
+       "label": "precision of 'sufficient'",
+       "definition": "When the grader said 'sufficient', how often a must-retrieve provision really was among the passages.",
+       "result": "0.94 (17 right of 18)",
+       "value": 0.94,
+       "target": null,
+       "met": null,
+       "detail": []
+      },
+      {
+       "key": "recall_grader",
+       "label": "recall of 'sufficient'",
+       "definition": "When a must-retrieve provision was among the passages, how often the grader said 'sufficient'; a miss costs a rewrite, not a wrong answer.",
+       "result": "0.71 (17 of 24; 7 false fails cost a rewrite each)",
+       "value": 0.71,
+       "target": null,
+       "met": null,
+       "detail": []
+      }
+     ],
+     "run": true
+    }
+   ]
+  },
+  {
+   "id": "end-to-end",
+   "title": "End to end",
+   "sub": "quick answers and full assessments",
+   "sets": [
+    {
+     "id": "E5",
+     "name": "Quick answers",
+     "what": "The quick path end to end: a short question, one retrieval, a three-sentence answer that must cite the right article, invent nothing, and stay within the passages it was given.",
+     "data": "15 questions, one per provision, over the same areas as retrieval; the questions that route quick are scored on what they cite, on invented labels, and on faithfulness judged statement by statement.",
+     "judged": {
+      "rules": "citations verified against the corpus, length counted",
+      "judge": "faithfulness, statement by statement",
+      "human": null
+     },
+     "metrics": [
+      {
+       "key": "quick_share",
+       "label": "answered on the quick path",
+       "definition": "Questions the router sent down the quick path; only those are scored below.",
+       "result": "15 of 15",
+       "value": 1.0,
+       "target": null,
+       "met": null,
+       "detail": []
+      },
+      {
+       "key": "must_cite",
+       "label": "must-cite recall",
+       "definition": "Share of expected provisions the answer cites, at article level, after the guardrail verified the labels.",
+       "result": "13 of 15",
+       "value": 0.867,
+       "target": "≥ 0.80",
+       "met": true,
+       "detail": [
+        "K-004: GDPR Art. 46",
+        "K-008: AI Act Art. 5"
+       ]
+      },
+      {
+       "key": "invented",
+       "label": "invented citations",
+       "definition": "Labels in the answer that do not exist in the corpus, counted before the guardrail marks them.",
+       "result": "0 in 15 answers",
+       "value": null,
+       "target": null,
+       "met": null,
+       "detail": []
+      },
+      {
+       "key": "faithfulness",
+       "label": "faithfulness, mean",
+       "definition": "Share of the answer's checkable statements that the retrieved passages (and the organisation facts read) support, judged statement by statement after splitting the text; recommendations and restatements of the input are left out.",
+       "result": "0.873 over 15",
+       "value": 0.873,
+       "target": "≥ 0.80",
+       "met": true,
+       "detail": []
+      },
+      {
+       "key": "length",
+       "label": "within three sentences",
+       "definition": "Answers within the three sentences the quick path is asked for.",
+       "result": "15 of 15",
+       "value": 1.0,
+       "target": null,
+       "met": null,
+       "detail": []
+      }
+     ],
+     "run": true
+    },
+    {
+     "id": "E6",
+     "name": "Full assessments",
+     "what": "The full path end to end: a feature description, the agent's assessment at the DPO's pause, scored on the verdict, the two flags, the citations, the key findings a reviewer expects (by a judge model with a rubric), and faithfulness to the passages and organisation facts it read.",
+     "data": "20 feature descriptions over eight areas with expected answers reviewed in two rounds (an AI model acting as the domain expert; the human expert pending), eight confusable pairs among them; five cases were also scored by hand to check the judge.",
+     "judged": {
+      "rules": "verdict, flags and citations against the expected ones",
+      "judge": "key findings with a rubric; faithfulness",
+      "human": "five cases scored blind to check the judge"
+     },
+     "metrics": [
+      {
+       "key": "assessed",
+       "label": "cases assessed",
+       "definition": "Cases that reached the DPO's pause with an assessment.",
+       "result": "20 of 20",
+       "value": 1.0,
+       "target": null,
+       "met": null,
+       "detail": []
+      },
+      {
+       "key": "verdict",
+       "label": "verdict accuracy",
+       "definition": "Cases whose verdict (Do not build as described, Proceed with conditions, Proceed) equals the expected one.",
+       "result": "13 of 20",
+       "value": 0.65,
+       "target": "≥ 0.80",
+       "met": false,
+       "detail": [
+        "A-001 (Proceed → Conditions)",
+        "A-008 (Proceed → Conditions)",
+        "A-009 (Do not build → Conditions)",
+        "A-012 (Conditions → Do not build)",
+        "A-017 (Conditions → Do not build)",
+        "A-019 (Proceed → Conditions)",
+        "A-020 (Do not build → Conditions)"
+       ]
+      },
+      {
+       "key": "dangerous",
+       "label": "dangerous misses",
+       "definition": "Cases expected 'Do not build as described' that got 'Proceed': the one error a DPO cannot see from the card alone.",
+       "result": "0",
+       "value": 0,
+       "target": "0",
+       "met": true,
+       "detail": []
+      },
+      {
+       "key": "risk",
+       "label": "risk level accuracy",
+       "definition": "Cases whose risk level (low, medium, high) equals the expected one; reported, not scored.",
+       "result": "13 of 20",
+       "value": 0.65,
+       "target": null,
+       "met": null,
+       "detail": []
+      },
+      {
+       "key": "flag_hr",
+       "label": "high-risk AI flag: missed · wrongly set",
+       "definition": "The high-risk AI flag: missed among the cases expected true, and wrongly set among the cases expected false.",
+       "result": "0 of 7 · 0 of 13",
+       "value": 1.0,
+       "target": null,
+       "met": null,
+       "detail": []
+      },
+      {
+       "key": "flag_dpia",
+       "label": "DPIA flag: missed · wrongly set",
+       "definition": "The DPIA flag: missed among the cases expected true, and wrongly set among the cases expected false.",
+       "result": "2 of 14 · 0 of 6",
+       "value": 0.9,
+       "target": null,
+       "met": null,
+       "detail": []
+      },
+      {
+       "key": "must_cite_e6",
+       "label": "must-cite recall",
+       "definition": "Share of expected provisions among the assessment's verified citations, at article level.",
+       "result": "37 of 39",
+       "value": 0.949,
+       "target": "≥ 0.80",
+       "met": true,
+       "detail": [
+        "A-007: GDPR Art. 22",
+        "A-010: AI Act Annex III"
+       ]
+      },
+      {
+       "key": "key_findings",
+       "label": "key findings matched · partial · missed",
+       "definition": "Expected key findings the judge found in the assessment: matched (same point, the expected provision at the asked level or an accepted alternative, the exact severity), partial (same point and severity, provision missing or at the wrong level), missed (point absent, or the severity wrong).",
+       "result": "59 · 10 · 12 of 81",
+       "value": 0.728,
+       "target": "≥ 0.75",
+       "met": false,
+       "detail": []
+      },
+      {
+       "key": "severity",
+       "label": "of the missed: wrong severity only",
+       "definition": "Of the missed findings, those with the right point and provision and only the wrong severity.",
+       "result": "7 of 12",
+       "value": 0.583,
+       "target": null,
+       "met": null,
+       "detail": []
+      },
+      {
+       "key": "wrong_extras",
+       "label": "wrong extras",
+       "definition": "Findings beyond the expected ones that are legally wrong: a provision cited for something it does not say, an obligation the facts say is already met, a false escalation. Correct extra points are not counted.",
+       "result": "2 in 20 cases",
+       "value": null,
+       "target": null,
+       "met": null,
+       "detail": [
+        "A-001",
+        "A-010"
+       ]
+      },
+      {
+       "key": "must_not",
+       "label": "red lines crossed",
+       "definition": "Red lines no assessment may cross: an invented provision, a claim that something is already recorded, a personal name.",
+       "result": "0",
+       "value": null,
+       "target": null,
+       "met": null,
+       "detail": []
+      },
+      {
+       "key": "faithfulness_e6",
+       "label": "faithfulness of the findings, mean",
+       "definition": "As for quick answers, over the findings' text, against the passages the agent retrieved and the organisation facts it read.",
+       "result": "0.851 over 20",
+       "value": 0.851,
+       "target": "≥ 0.80",
+       "met": true,
+       "detail": []
+      },
+      {
+       "key": "pairs",
+       "label": "confusable pairs both right",
+       "definition": "Confusable pairs (two situations that sound alike but have different answers) where both cases got the verdict and the flags right.",
+       "result": "5 of 8",
+       "value": 0.625,
+       "target": null,
+       "met": null,
+       "detail": [
+        "A-007+A-019",
+        "A-008+A-009",
+        "A-012+A-016"
+       ]
+      },
+      {
+       "key": "judge",
+       "label": "judge agrees with a human reader",
+       "definition": "The judge's verdicts against a careful non-expert reader's, on five cases scored blind with the same rubric; rows the reader marked unsure are left out.",
+       "result": "13 of 15 findings (4 unsure left out)",
+       "value": 0.867,
+       "target": "≥ 0.85",
+       "met": true,
+       "detail": [
+        "A-003 KF1: human partial, judge matched",
+        "A-003 KF5: human partial, judge matched"
+       ]
+      }
+     ],
+     "run": true
+    }
+   ]
+  }
+ ],
+ "targets": [
+  {
+   "key": "route_accuracy",
+   "label": "route accuracy",
+   "definition": "Inputs the router sent the expected way (quick, full or reject), as decided by the app: the classifier, the fallback and the confidence floor.",
+   "result": "44 of 45",
+   "value": 0.978,
+   "target": "≥ 0.90",
+   "met": true,
+   "detail": [
+    "R-042 (full → reject)"
+   ]
+  },
+  {
+   "key": "recall_loop",
+   "label": "must-retrieve recall@5, with the loop",
+   "definition": "Share of must-retrieve provisions found among the five passages the agentic loop returned.",
+   "result": "19 of 20",
+   "value": 0.95,
+   "target": "≥ 0.85",
+   "met": true,
+   "detail": [
+    "Q-014: AI Act Art. 5"
+   ]
+  },
+  {
+   "key": "must_cite",
+   "label": "must-cite recall",
+   "definition": "Share of expected provisions the answer cites, at article level, after the guardrail verified the labels.",
+   "result": "13 of 15",
+   "value": 0.867,
+   "target": "≥ 0.80",
+   "met": true,
+   "detail": [
+    "K-004: GDPR Art. 46",
+    "K-008: AI Act Art. 5"
+   ]
+  },
+  {
+   "key": "faithfulness",
+   "label": "faithfulness, mean",
+   "definition": "Share of the answer's checkable statements that the retrieved passages (and the organisation facts read) support, judged statement by statement after splitting the text; recommendations and restatements of the input are left out.",
+   "result": "0.873 over 15",
+   "value": 0.873,
+   "target": "≥ 0.80",
+   "met": true,
+   "detail": []
+  },
+  {
+   "key": "verdict",
+   "label": "verdict accuracy",
+   "definition": "Cases whose verdict (Do not build as described, Proceed with conditions, Proceed) equals the expected one.",
+   "result": "13 of 20",
+   "value": 0.65,
+   "target": "≥ 0.80",
+   "met": false,
+   "detail": [
+    "A-001 (Proceed → Conditions)",
+    "A-008 (Proceed → Conditions)",
+    "A-009 (Do not build → Conditions)",
+    "A-012 (Conditions → Do not build)",
+    "A-017 (Conditions → Do not build)",
+    "A-019 (Proceed → Conditions)",
+    "A-020 (Do not build → Conditions)"
+   ]
+  },
+  {
+   "key": "dangerous",
+   "label": "dangerous misses",
+   "definition": "Cases expected 'Do not build as described' that got 'Proceed': the one error a DPO cannot see from the card alone.",
+   "result": "0",
+   "value": 0,
+   "target": "0",
+   "met": true,
+   "detail": []
+  },
+  {
+   "key": "must_cite_e6",
+   "label": "must-cite recall",
+   "definition": "Share of expected provisions among the assessment's verified citations, at article level.",
+   "result": "37 of 39",
+   "value": 0.949,
+   "target": "≥ 0.80",
+   "met": true,
+   "detail": [
+    "A-007: GDPR Art. 22",
+    "A-010: AI Act Annex III"
+   ]
+  },
+  {
+   "key": "key_findings",
+   "label": "key findings matched · partial · missed",
+   "definition": "Expected key findings the judge found in the assessment: matched (same point, the expected provision at the asked level or an accepted alternative, the exact severity), partial (same point and severity, provision missing or at the wrong level), missed (point absent, or the severity wrong).",
+   "result": "59 · 10 · 12 of 81",
+   "value": 0.728,
+   "target": "≥ 0.75",
+   "met": false,
+   "detail": []
+  },
+  {
+   "key": "faithfulness_e6",
+   "label": "faithfulness of the findings, mean",
+   "definition": "As for quick answers, over the findings' text, against the passages the agent retrieved and the organisation facts it read.",
+   "result": "0.851 over 20",
+   "value": 0.851,
+   "target": "≥ 0.80",
+   "met": true,
+   "detail": []
+  },
+  {
+   "key": "judge",
+   "label": "judge agrees with a human reader",
+   "definition": "The judge's verdicts against a careful non-expert reader's, on five cases scored blind with the same rubric; rows the reader marked unsure are left out.",
+   "result": "13 of 15 findings (4 unsure left out)",
+   "value": 0.867,
+   "target": "≥ 0.85",
+   "met": true,
+   "detail": [
+    "A-003 KF1: human partial, judge matched",
+    "A-003 KF5: human partial, judge matched"
+   ]
+  }
+ ],
+ "targets_met": 8,
+ "targets_scored": 10,
+ "e12": {
+  "route_accuracy": {
+   "right": 44,
+   "of": 45,
+   "wrong": [
+    "R-042 (full → reject)"
+   ]
+  },
+  "fallback": {
+   "count": 0,
+   "of": 45
+  },
+  "detection": {
+   "injection": {
+    "detected": 7,
+    "of": 7,
+    "missed": []
+   },
+   "pii_redacted": {
+    "detected": 7,
+    "of": 7,
+    "missed": []
+   },
+   "off_topic": {
+    "detected": 4,
+    "of": 4,
+    "missed": []
+   }
+  },
+  "false_positives": {
+   "count": 0,
+   "of": 27,
+   "ids": []
+  },
+  "redactions_exact": {
+   "right": 7,
+   "of": 7
+  },
+  "confusions": {
+   "full→reject": 1
+  },
+  "route_matrix": {
+   "order": [
+    "quick",
+    "full",
+    "reject"
+   ],
+   "counts": {
+    "quick": {
+     "quick": 11,
+     "full": 0,
+     "reject": 0
+    },
+    "full": {
+     "quick": 0,
+     "full": 22,
+     "reject": 1
+    },
+    "reject": {
+     "quick": 0,
+     "full": 0,
+     "reject": 11
+    }
+   }
+  },
+  "misrouted": [
+   {
+    "id": "R-042",
+    "kind": "pii",
+    "expected": "full",
+    "got": "reject",
+    "screen": [
+     "injection",
+     "pii_redacted"
+    ],
+    "text": "Card 4111 1111 1111 1111 was used in a disputed order; we want to store card numbers in plain text to speed up refunds."
+   }
+  ]
+ },
+ "e7": {
+  "caught": 4,
+  "of": 4,
+  "missed": [],
+  "faults": [
+   {
+    "id": "F-001",
+    "fault": "unknown_citation",
+    "name": "Unknown citation",
+    "planted": "citation GDPR Art. 99(9) added to finding 1",
+    "expected": "regenerate",
+    "ok": true,
+    "why": "regenerate: ['GDPR Art. 99(9)']"
+   },
+   {
+    "id": "F-002",
+    "fault": "pii_in_text",
+    "name": "Personal name and contact details",
+    "planted": "personal data appended to finding 1",
+    "expected": "redact:2",
+    "ok": true,
+    "why": "2 redactions; finding ends: '22(3) safeguards. Contact Lena Kowalski at [REDACTED_EMAIL] or [REDACTED_PHONE].'"
+   },
+   {
+    "id": "F-003",
+    "fault": "schema_violation",
+    "name": "Broken structure",
+    "planted": "severity of finding 1 set to 'Critical' (as a dict: the schema rejects it)",
+    "expected": "regenerate",
+    "ok": true,
+    "why": "regenerate: 1 validation error for Assessment"
+   },
+   {
+    "id": "F-004",
+    "fault": "status_reply",
+    "name": "Status message instead of an assessment",
+    "planted": "a status reply instead of the assessment",
+    "expected": "regenerate",
+    "ok": true,
+    "why": "regenerate: status reply instead of an assessment"
+   }
+  ]
+ },
+ "e3": {
+  "recall_loop": {
+   "found": 19,
+   "of": 20
+  },
+  "recall_single": {
+   "found": 16,
+   "of": 20
+  },
+  "nice_recall_loop": {
+   "found": 24,
+   "of": 39
+  },
+  "attempts_mean": 1.45,
+  "rewrites_total": 9,
+  "insufficient": [
+   "Q-008"
+  ],
+  "loop_misses": [
+   "Q-014: AI Act Art. 5"
+  ],
+  "single_misses": [
+   "Q-005: GDPR Art. 45",
+   "Q-006: GDPR Art. 6",
+   "Q-008: AI Act Art. 5",
+   "Q-014: AI Act Art. 5"
+  ],
+  "cost": 0.0088,
+  "grader": {
+   "tp": 17,
+   "fp": 1,
+   "fn": 7,
+   "tn": 4,
+   "grades": 29,
+   "precision": 0.94,
+   "recall": 0.71,
+   "confidence_min_median_max": [
+    0.88,
+    0.98,
+    1.0
+   ],
+   "sweep": [
+    {
+     "threshold": 0.5,
+     "false_pass": 1,
+     "false_fail": 7,
+     "accepted": 18,
+     "of": 29
+    },
+    {
+     "threshold": 0.6,
+     "false_pass": 1,
+     "false_fail": 7,
+     "accepted": 18,
+     "of": 29
+    },
+    {
+     "threshold": 0.7,
+     "false_pass": 1,
+     "false_fail": 7,
+     "accepted": 18,
+     "of": 29
+    },
+    {
+     "threshold": 0.8,
+     "false_pass": 1,
+     "false_fail": 7,
+     "accepted": 18,
+     "of": 29
+    },
+    {
+     "threshold": 0.9,
+     "false_pass": 1,
+     "false_fail": 9,
+     "accepted": 16,
+     "of": 29
+    },
+    {
+     "threshold": 0.95,
+     "false_pass": 1,
+     "false_fail": 12,
+     "accepted": 13,
+     "of": 29
+    }
+   ],
+   "false_pass": [
+    {
+     "id": "Q-014",
+     "confidence": 0.97
+    }
+   ],
+   "false_fail": [
+    "Q-002",
+    "Q-004",
+    "Q-008",
+    "Q-008",
+    "Q-009",
+    "Q-009",
+    "Q-013"
+   ],
+   "grades_logged": 29
+  },
+  "gain": {
+   "queries": 3,
+   "points": 15,
+   "relative_pct": 19,
+   "recovered": [
+    "Q-005",
+    "Q-006",
+    "Q-008"
+   ]
+  },
+  "hard": [
+   {
+    "id": "Q-005",
+    "provision": "GDPR Art. 45",
+    "domain": "D2",
+    "domain_name": "Data sharing and transfers",
+    "recovered": true,
+    "text": "found at the second search, after 1 rewrite"
+   },
+   {
+    "id": "Q-006",
+    "provision": "GDPR Art. 6",
+    "domain": "D2",
+    "domain_name": "Data sharing and transfers",
+    "recovered": true,
+    "text": "found at the second search, after 1 rewrite"
+   },
+   {
+    "id": "Q-008",
+    "provision": "AI Act Art. 5",
+    "domain": "D4",
+    "domain_name": "AI that is not high-risk",
+    "recovered": true,
+    "text": "found at the second search, after 1 rewrite; the grader still said not enough and searched again"
+   },
+   {
+    "id": "Q-014",
+    "provision": "AI Act Art. 5",
+    "domain": "D6",
+    "domain_name": "Special-category data",
+    "recovered": false,
+    "text": "2 searches without it; the grader accepted the last set"
+   }
+  ]
+ },
+ "e5": {
+  "quick_answers": {
+   "count": 15,
+   "of": 15,
+   "not_quick": []
+  },
+  "must_cite": {
+   "found": 13,
+   "of": 15,
+   "misses": [
+    "K-004: GDPR Art. 46",
+    "K-008: AI Act Art. 5"
+   ]
+  },
+  "invented": {
+   "count": 0,
+   "rows": []
+  },
+  "faithfulness": {
+   "mean": 0.873,
+   "over": 15,
+   "errors": []
+  },
+  "over_three_sentences": [],
+  "empty": [],
+  "cost": 0.0325,
+  "per_case": [
+   {
+    "id": "K-001",
+    "quick": true,
+    "must": [
+     "GDPR Art. 22"
+    ],
+    "found": [
+     "GDPR Art. 22"
+    ],
+    "missing": [],
+    "faithfulness": 0.833,
+    "unsupported": [
+     "Whether an Art. 22(2) exception applies requires a full assessment"
+    ],
+    "cost": 0.0021
+   },
+   {
+    "id": "K-002",
+    "quick": true,
+    "must": [
+     "GDPR Art. 6"
+    ],
+    "found": [
+     "GDPR Art. 6"
+    ],
+    "missing": [],
+    "faithfulness": 1.0,
+    "unsupported": [],
+    "cost": 0.0029
+   },
+   {
+    "id": "K-003",
+    "quick": true,
+    "must": [
+     "GDPR Art. 4"
+    ],
+    "found": [
+     "GDPR Art. 4"
+    ],
+    "missing": [],
+    "faithfulness": 1.0,
+    "unsupported": [],
+    "cost": 0.0016
+   },
+   {
+    "id": "K-004",
+    "quick": true,
+    "must": [
+     "GDPR Art. 46"
+    ],
+    "found": [],
+    "missing": [
+     "GDPR Art. 46"
+    ],
+    "faithfulness": 0.8,
+    "unsupported": [
+     "Certification is not itself a prerequisite for transferring personal data to a vendor in a third country"
+    ],
+    "cost": 0.0026
+   },
+   {
+    "id": "K-005",
+    "quick": true,
+    "must": [
+     "GDPR Art. 45"
+    ],
+    "found": [
+     "GDPR Art. 45"
+    ],
+    "missing": [],
+    "faithfulness": 0.75,
+    "unsupported": [
+     "GDPR Art. 45 is the provision under which a transfer may rely on an adequacy decision, such as the EU-US Data Privacy Framework."
+    ],
+    "cost": 0.002
+   },
+   {
+    "id": "K-007",
+    "quick": true,
+    "must": [
+     "AI Act Annex III"
+    ],
+    "found": [
+     "AI Act Annex III"
+    ],
+    "missing": [],
+    "faithfulness": 0.6,
+    "unsupported": [
+     "An AI system used to evaluate the creditworthiness of natural persons may fall outside the high-risk classification only under the conditions in AI Act Art. 6(3).",
+     "Profiling of natural persons is always high-risk."
+    ],
+    "cost": 0.0019
+   },
+   {
+    "id": "K-008",
+    "quick": true,
+    "must": [
+     "AI Act Art. 5"
+    ],
+    "found": [],
+    "missing": [
+     "AI Act Art. 5"
+    ],
+    "faithfulness": 1.0,
+    "unsupported": [],
+    "cost": 0.0019
+   },
+   {
+    "id": "K-009",
+    "quick": true,
+    "must": [
+     "AI Act Art. 26"
+    ],
+    "found": [
+     "AI Act Art. 26"
+    ],
+    "missing": [],
+    "faithfulness": 0.929,
+    "unsupported": [
+     "If the company puts its name on a high-risk AI system, substantially modifies it, or changes its intended purpose so it becomes high-risk, it may become the provider of that system"
+    ],
+    "cost": 0.0034
+   },
+   {
+    "id": "K-010",
+    "quick": true,
+    "must": [
+     "AI Act Art. 50"
+    ],
+    "found": [
+     "AI Act Art. 50"
+    ],
+    "missing": [],
+    "faithfulness": 0.75,
+    "unsupported": [
+     "Where an AI system is intended to interact with vulnerable groups, account must be taken of age or disability"
+    ],
+    "cost": 0.0018
+   },
+   {
+    "id": "K-013",
+    "quick": true,
+    "must": [
+     "GDPR Art. 9"
+    ],
+    "found": [
+     "GDPR Art. 9"
+    ],
+    "missing": [],
+    "faithfulness": 0.833,
+    "unsupported": [
+     "Using data concerning health inferred from purchase patterns for targeted offers requires a valid lawful basis and an applicable exception to the special-category processing prohibition under GDPR Art. 9"
+    ],
+    "cost": 0.0025
+   },
+   {
+    "id": "K-015",
+    "quick": true,
+    "must": [
+     "GDPR Art. 35"
+    ],
+    "found": [
+     "GDPR Art. 35"
+    ],
+    "missing": [],
+    "faithfulness": 1.0,
+    "unsupported": [],
+    "cost": 0.0022
+   },
+   {
+    "id": "K-016",
+    "quick": true,
+    "must": [
+     "GDPR Art. 36"
+    ],
+    "found": [
+     "GDPR Art. 36"
+    ],
+    "missing": [],
+    "faithfulness": 1.0,
+    "unsupported": [],
+    "cost": 0.0017
+   },
+   {
+    "id": "K-017",
+    "quick": true,
+    "must": [
+     "GDPR Art. 17"
+    ],
+    "found": [
+     "GDPR Art. 17"
+    ],
+    "missing": [],
+    "faithfulness": 1.0,
+    "unsupported": [],
+    "cost": 0.0017
+   },
+   {
+    "id": "K-018",
+    "quick": true,
+    "must": [
+     "GDPR Art. 18"
+    ],
+    "found": [
+     "GDPR Art. 18"
+    ],
+    "missing": [],
+    "faithfulness": 0.6,
+    "unsupported": [
+     "During restriction of processing, generally only storage of the personal data is allowed, subject to limited exceptions",
+     "GDPR Art. 18(2) is the provision that states that, during restriction, personal data may generally only be stored, subject to limited exceptions",
+     "Under GDPR Rec. 67, inaccurate personal data should be rectified without undue delay",
+     "GDPR Rec. 67 is the recital that addresses flagging restricted data and rectifying inaccurate data without undue delay"
+    ],
+    "cost": 0.0024
+   },
+   {
+    "id": "K-020",
+    "quick": true,
+    "must": [
+     "GDPR Art. 7"
+    ],
+    "found": [
+     "GDPR Art. 7"
+    ],
+    "missing": [],
+    "faithfulness": 1.0,
+    "unsupported": [],
+    "cost": 0.0016
+   }
+  ]
+ },
+ "e6": {
+  "verdict_matrix": {
+   "order": [
+    "Do not build as described",
+    "Proceed with conditions",
+    "Proceed"
+   ],
+   "counts": {
+    "Do not build as described": {
+     "Do not build as described": 5,
+     "Proceed with conditions": 2,
+     "Proceed": 0
+    },
+    "Proceed with conditions": {
+     "Do not build as described": 2,
+     "Proceed with conditions": 8,
+     "Proceed": 0
+    },
+    "Proceed": {
+     "Do not build as described": 0,
+     "Proceed with conditions": 3,
+     "Proceed": 0
+    }
+   }
+  },
+  "severity_matrix": {
+   "order": [
+    "Blocker",
+    "Required",
+    "Covered"
+   ],
+   "counts": {
+    "Blocker": {
+     "Blocker": 0,
+     "Required": 1,
+     "Covered": 0
+    },
+    "Required": {
+     "Blocker": 3,
+     "Required": 0,
+     "Covered": 0
+    },
+    "Covered": {
+     "Blocker": 1,
+     "Required": 2,
+     "Covered": 0
+    }
+   }
+  },
+  "key_findings": {
+   "matched": 59,
+   "partial": 10,
+   "severity_miscalibrated": 7,
+   "of": 81,
+   "judged_cases": 20,
+   "judge_errors": [],
+   "missed": 12,
+   "missed_absent": 5
+  },
+  "flags": {
+   "high_risk_ai": {
+    "missed": 0,
+    "positives": 7,
+    "false": 0,
+    "negatives": 13
+   },
+   "dpia_required": {
+    "missed": 2,
+    "positives": 14,
+    "false": 0,
+    "negatives": 6
+   }
+  },
+  "verdict": {
+   "right": 13,
+   "of": 20,
+   "wrong": [
+    "A-001 (Proceed → Proceed with conditions)",
+    "A-008 (Proceed → Proceed with conditions)",
+    "A-009 (Do not build as described → Proceed with conditions)",
+    "A-012 (Proceed with conditions → Do not build as described)",
+    "A-017 (Proceed with conditions → Do not build as described)",
+    "A-019 (Proceed → Proceed with conditions)",
+    "A-020 (Do not build as described → Proceed with conditions)"
+   ]
+  },
+  "dangerous_misses": [],
+  "risk_level": {
+   "right": 13,
+   "of": 20
+  },
+  "must_cite": {
+   "found": 37,
+   "of": 39,
+   "misses": [
+    "A-007: GDPR Art. 22",
+    "A-010: AI Act Annex III"
+   ]
+  },
+  "wrong_extras": [
+   "A-001: Finding 2 [Required]: requires checking and updating the notice to describe the strip's purpose and legal basis (GDPR Art. 13(1)), although the organisation facts say the existing notice already covers browsing activity inside the account; this is an obligation marked Required that the facts say is already done (contextual blindness).",
+   "A-010: Finding 1: Blocker invoking GDPR Art. 22 for the threshold hold, although the analyst reviews every hold within two hours, so the decision is not solely automated (false escalation and statutory misapplication)."
+  ],
+  "must_not_violations": [],
+  "faithfulness": {
+   "mean": 0.851,
+   "over": 20
+  },
+  "pairs": {
+   "right": 5,
+   "total": 8,
+   "failed": [
+    "A-007+A-019",
+    "A-008+A-009",
+    "A-012+A-016"
+   ]
+  },
+  "run": {
+   "rewrites": 32,
+   "regenerations": 0,
+   "seconds_mean": 75.6
+  },
+  "cost": 0.1298,
+  "judge_cost": 0.1817,
+  "judge_vs_human": {
+   "agreed": 13,
+   "of": 15,
+   "unsure": [
+    "A-002 KF1",
+    "A-004 KF2",
+    "A-004 KF5",
+    "A-005 KF1"
+   ],
+   "disagreed": [
+    "A-003 KF1: human partial, judge matched",
+    "A-003 KF5: human partial, judge matched"
+   ]
+  },
+  "per_case": [
+   {
+    "id": "A-001",
+    "domain": "D7",
+    "title": "Recently viewed products strip",
+    "expected_verdict": "Proceed",
+    "verdict": "Proceed with conditions",
+    "verdict_ok": false,
+    "dangerous": false,
+    "risk_level": "low",
+    "risk_ok": true,
+    "high_risk_ai": {
+     "got": false,
+     "expected": false
+    },
+    "dpia_required": {
+     "got": false,
+     "expected": false
+    },
+    "key_findings": {
+     "matched": 2,
+     "partial": 0,
+     "missed": 0,
+     "of": 2,
+     "severity_miscalibrated": 0
+    },
+    "must_cite": {
+     "found": [
+      "GDPR Art. 5"
+     ],
+     "missing": []
+    },
+    "wrong_extras": 1,
+    "faithfulness": 1.0,
+    "cost": 0.0068,
+    "seconds": 35.29,
+    "searches": 4,
+    "rewrites": 0
+   },
+   {
+    "id": "A-002",
+    "domain": "D2",
+    "title": "Customer support ticket hosting by helpdesk vendor in India",
+    "expected_verdict": "Proceed with conditions",
+    "verdict": "Proceed with conditions",
+    "verdict_ok": true,
+    "dangerous": false,
+    "risk_level": "high",
+    "risk_ok": false,
+    "high_risk_ai": {
+     "got": false,
+     "expected": false
+    },
+    "dpia_required": {
+     "got": false,
+     "expected": false
+    },
+    "key_findings": {
+     "matched": 3,
+     "partial": 0,
+     "missed": 0,
+     "of": 3,
+     "severity_miscalibrated": 0
+    },
+    "must_cite": {
+     "found": [
+      "GDPR Art. 46",
+      "GDPR Art. 28"
+     ],
+     "missing": []
+    },
+    "wrong_extras": 0,
+    "faithfulness": 0.833,
+    "cost": 0.0176,
+    "seconds": 73.03,
+    "searches": 9,
+    "rewrites": 3
+   },
+   {
+    "id": "A-003",
+    "domain": "D1",
+    "title": "Automated BNPL credit scoring and US fraud-vendor sharing",
+    "expected_verdict": "Do not build as described",
+    "verdict": "Do not build as described",
+    "verdict_ok": true,
+    "dangerous": false,
+    "risk_level": "high",
+    "risk_ok": true,
+    "high_risk_ai": {
+     "got": true,
+     "expected": true
+    },
+    "dpia_required": {
+     "got": true,
+     "expected": true
+    },
+    "key_findings": {
+     "matched": 6,
+     "partial": 0,
+     "missed": 0,
+     "of": 6,
+     "severity_miscalibrated": 0
+    },
+    "must_cite": {
+     "found": [
+      "GDPR Art. 22",
+      "GDPR Art. 35",
+      "AI Act Annex III"
+     ],
+     "missing": []
+    },
+    "wrong_extras": 0,
+    "faithfulness": 0.926,
+    "cost": 0.0187,
+    "seconds": 79.81,
+    "searches": 11,
+    "rewrites": 2
+   },
+   {
+    "id": "A-004",
+    "domain": "D1",
+    "title": "BNPL checkout credit scoring using transaction history and device data",
+    "expected_verdict": "Proceed with conditions",
+    "verdict": "Proceed with conditions",
+    "verdict_ok": true,
+    "dangerous": false,
+    "risk_level": "high",
+    "risk_ok": true,
+    "high_risk_ai": {
+     "got": true,
+     "expected": true
+    },
+    "dpia_required": {
+     "got": true,
+     "expected": true
+    },
+    "key_findings": {
+     "matched": 4,
+     "partial": 1,
+     "missed": 0,
+     "of": 5,
+     "severity_miscalibrated": 0
+    },
+    "must_cite": {
+     "found": [
+      "GDPR Art. 35",
+      "AI Act Annex III"
+     ],
+     "missing": []
+    },
+    "wrong_extras": 0,
+    "faithfulness": 0.897,
+    "cost": 0.0183,
+    "seconds": 62.01,
+    "searches": 10,
+    "rewrites": 1
+   },
+   {
+    "id": "A-005",
+    "domain": "D4",
+    "title": "Help-page chatbot for order status and returns",
+    "expected_verdict": "Proceed with conditions",
+    "verdict": "Proceed with conditions",
+    "verdict_ok": true,
+    "dangerous": false,
+    "risk_level": "low",
+    "risk_ok": true,
+    "high_risk_ai": {
+     "got": false,
+     "expected": false
+    },
+    "dpia_required": {
+     "got": false,
+     "expected": false
+    },
+    "key_findings": {
+     "matched": 2,
+     "partial": 1,
+     "missed": 0,
+     "of": 3,
+     "severity_miscalibrated": 0
+    },
+    "must_cite": {
+     "found": [
+      "AI Act Art. 50"
+     ],
+     "missing": []
+    },
+    "wrong_extras": 0,
+    "faithfulness": 0.818,
+    "cost": 0.0119,
+    "seconds": 53.63,
+    "searches": 7,
+    "rewrites": 1
+   },
+   {
+    "id": "A-006",
+    "domain": "D4",
+    "title": "Help-page chatbot with automated refund decisions",
+    "expected_verdict": "Do not build as described",
+    "verdict": "Do not build as described",
+    "verdict_ok": true,
+    "dangerous": false,
+    "risk_level": "high",
+    "risk_ok": false,
+    "high_risk_ai": {
+     "got": false,
+     "expected": false
+    },
+    "dpia_required": {
+     "got": true,
+     "expected": true
+    },
+    "key_findings": {
+     "matched": 3,
+     "partial": 1,
+     "missed": 0,
+     "of": 4,
+     "severity_miscalibrated": 0
+    },
+    "must_cite": {
+     "found": [
+      "GDPR Art. 22",
+      "AI Act Art. 50"
+     ],
+     "missing": []
+    },
+    "wrong_extras": 0,
+    "faithfulness": 0.786,
+    "cost": 0.013,
+    "seconds": 103.48,
+    "searches": 8,
+    "rewrites": 2
+   },
+   {
+    "id": "A-007",
+    "domain": "D1",
+    "title": "Transaction-based customer profiles for in-app promotions",
+    "expected_verdict": "Proceed with conditions",
+    "verdict": "Proceed with conditions",
+    "verdict_ok": true,
+    "dangerous": false,
+    "risk_level": "medium",
+    "risk_ok": true,
+    "high_risk_ai": {
+     "got": false,
+     "expected": false
+    },
+    "dpia_required": {
+     "got": false,
+     "expected": true
+    },
+    "key_findings": {
+     "matched": 2,
+     "partial": 0,
+     "missed": 2,
+     "of": 4,
+     "severity_miscalibrated": 0
+    },
+    "must_cite": {
+     "found": [
+      "GDPR Art. 21",
+      "GDPR Art. 6"
+     ],
+     "missing": [
+      "GDPR Art. 22"
+     ]
+    },
+    "wrong_extras": 0,
+    "faithfulness": 0.889,
+    "cost": 0.0138,
+    "seconds": 69.52,
+    "searches": 8,
+    "rewrites": 2
+   },
+   {
+    "id": "A-008",
+    "domain": "D2",
+    "title": "Monthly churn dashboards by Northline Analytics",
+    "expected_verdict": "Proceed",
+    "verdict": "Proceed with conditions",
+    "verdict_ok": false,
+    "dangerous": false,
+    "risk_level": "medium",
+    "risk_ok": false,
+    "high_risk_ai": {
+     "got": false,
+     "expected": false
+    },
+    "dpia_required": {
+     "got": false,
+     "expected": false
+    },
+    "key_findings": {
+     "matched": 2,
+     "partial": 0,
+     "missed": 0,
+     "of": 2,
+     "severity_miscalibrated": 0
+    },
+    "must_cite": {
+     "found": [
+      "GDPR Art. 28"
+     ],
+     "missing": []
+    },
+    "wrong_extras": 0,
+    "faithfulness": 0.722,
+    "cost": 0.0112,
+    "seconds": 47.71,
+    "searches": 5,
+    "rewrites": 1
+   },
+   {
+    "id": "A-009",
+    "domain": "D2",
+    "title": "Northline Analytics reuse of transaction data for churn-model training",
+    "expected_verdict": "Do not build as described",
+    "verdict": "Proceed with conditions",
+    "verdict_ok": false,
+    "dangerous": false,
+    "risk_level": "high",
+    "risk_ok": true,
+    "high_risk_ai": {
+     "got": false,
+     "expected": false
+    },
+    "dpia_required": {
+     "got": false,
+     "expected": true
+    },
+    "key_findings": {
+     "matched": 2,
+     "partial": 0,
+     "missed": 2,
+     "of": 4,
+     "severity_miscalibrated": 1
+    },
+    "must_cite": {
+     "found": [
+      "GDPR Art. 6",
+      "GDPR Art. 28"
+     ],
+     "missing": []
+    },
+    "wrong_extras": 0,
+    "faithfulness": 0.667,
+    "cost": 0.0128,
+    "seconds": 55.64,
+    "searches": 8,
+    "rewrites": 1
+   },
+   {
+    "id": "A-010",
+    "domain": "D3",
+    "title": "Real-time card-transaction fraud scoring and holds",
+    "expected_verdict": "Proceed with conditions",
+    "verdict": "Proceed with conditions",
+    "verdict_ok": true,
+    "dangerous": false,
+    "risk_level": "high",
+    "risk_ok": false,
+    "high_risk_ai": {
+     "got": false,
+     "expected": false
+    },
+    "dpia_required": {
+     "got": true,
+     "expected": true
+    },
+    "key_findings": {
+     "matched": 3,
+     "partial": 1,
+     "missed": 1,
+     "of": 5,
+     "severity_miscalibrated": 1
+    },
+    "must_cite": {
+     "found": [
+      "GDPR Art. 35",
+      "GDPR Art. 45"
+     ],
+     "missing": [
+      "AI Act Annex III"
+     ]
+    },
+    "wrong_extras": 1,
+    "faithfulness": 0.917,
+    "cost": 0.0155,
+    "seconds": 50.99,
+    "searches": 7,
+    "rewrites": 0
+   },
+   {
+    "id": "A-011",
+    "domain": "D3",
+    "title": "Fine-tuned credit-scoring model for overdraft limits",
+    "expected_verdict": "Proceed with conditions",
+    "verdict": "Proceed with conditions",
+    "verdict_ok": true,
+    "dangerous": false,
+    "risk_level": "high",
+    "risk_ok": true,
+    "high_risk_ai": {
+     "got": true,
+     "expected": true
+    },
+    "dpia_required": {
+     "got": true,
+     "expected": true
+    },
+    "key_findings": {
+     "matched": 6,
+     "partial": 0,
+     "missed": 1,
+     "of": 7,
+     "severity_miscalibrated": 0
+    },
+    "must_cite": {
+     "found": [
+      "AI Act Annex III",
+      "AI Act Art. 25",
+      "GDPR Art. 35"
+     ],
+     "missing": []
+    },
+    "wrong_extras": 0,
+    "faithfulness": 0.9,
+    "cost": 0.0229,
+    "seconds": 58.9,
+    "searches": 13,
+    "rewrites": 0
+   },
+   {
+    "id": "A-012",
+    "domain": "D3",
+    "title": "Selfie-to-ID biometric identity verification for account opening",
+    "expected_verdict": "Proceed with conditions",
+    "verdict": "Do not build as described",
+    "verdict_ok": false,
+    "dangerous": false,
+    "risk_level": "high",
+    "risk_ok": false,
+    "high_risk_ai": {
+     "got": false,
+     "expected": false
+    },
+    "dpia_required": {
+     "got": true,
+     "expected": true
+    },
+    "key_findings": {
+     "matched": 2,
+     "partial": 1,
+     "missed": 1,
+     "of": 4,
+     "severity_miscalibrated": 1
+    },
+    "must_cite": {
+     "found": [
+      "GDPR Art. 9",
+      "AI Act Annex III"
+     ],
+     "missing": []
+    },
+    "wrong_extras": 0,
+    "faithfulness": 0.667,
+    "cost": 0.018,
+    "seconds": 76.5,
+    "searches": 8,
+    "rewrites": 1
+   },
+   {
+    "id": "A-013",
+    "domain": "D5",
+    "title": "AI screening and automated rejection of job applicants",
+    "expected_verdict": "Do not build as described",
+    "verdict": "Do not build as described",
+    "verdict_ok": true,
+    "dangerous": false,
+    "risk_level": "high",
+    "risk_ok": true,
+    "high_risk_ai": {
+     "got": true,
+     "expected": true
+    },
+    "dpia_required": {
+     "got": true,
+     "expected": true
+    },
+    "key_findings": {
+     "matched": 4,
+     "partial": 0,
+     "missed": 0,
+     "of": 4,
+     "severity_miscalibrated": 0
+    },
+    "must_cite": {
+     "found": [
+      "GDPR Art. 22",
+      "AI Act Annex III",
+      "GDPR Art. 35"
+     ],
+     "missing": []
+    },
+    "wrong_extras": 0,
+    "faithfulness": 0.96,
+    "cost": 0.0177,
+    "seconds": 83.48,
+    "searches": 9,
+    "rewrites": 2
+   },
+   {
+    "id": "A-014",
+    "domain": "D5",
+    "title": "AI-assisted recruitment application ranking",
+    "expected_verdict": "Proceed with conditions",
+    "verdict": "Proceed with conditions",
+    "verdict_ok": true,
+    "dangerous": false,
+    "risk_level": "high",
+    "risk_ok": true,
+    "high_risk_ai": {
+     "got": true,
+     "expected": true
+    },
+    "dpia_required": {
+     "got": true,
+     "expected": true
+    },
+    "key_findings": {
+     "matched": 3,
+     "partial": 0,
+     "missed": 1,
+     "of": 4,
+     "severity_miscalibrated": 1
+    },
+    "must_cite": {
+     "found": [
+      "AI Act Annex III",
+      "GDPR Art. 35"
+     ],
+     "missing": []
+    },
+    "wrong_extras": 0,
+    "faithfulness": 0.941,
+    "cost": 0.0246,
+    "seconds": 107.07,
+    "searches": 12,
+    "rewrites": 3
+   },
+   {
+    "id": "A-015",
+    "domain": "D5",
+    "title": "Performance-based shift allocation and monthly review flags",
+    "expected_verdict": "Proceed with conditions",
+    "verdict": "Proceed with conditions",
+    "verdict_ok": true,
+    "dangerous": false,
+    "risk_level": "high",
+    "risk_ok": true,
+    "high_risk_ai": {
+     "got": true,
+     "expected": true
+    },
+    "dpia_required": {
+     "got": true,
+     "expected": true
+    },
+    "key_findings": {
+     "matched": 4,
+     "partial": 1,
+     "missed": 0,
+     "of": 5,
+     "severity_miscalibrated": 0
+    },
+    "must_cite": {
+     "found": [
+      "AI Act Annex III",
+      "GDPR Art. 35"
+     ],
+     "missing": []
+    },
+    "wrong_extras": 0,
+    "faithfulness": 0.909,
+    "cost": 0.0164,
+    "seconds": 90.3,
+    "searches": 8,
+    "rewrites": 0
+   },
+   {
+    "id": "A-016",
+    "domain": "D6",
+    "title": "Real-time facial watch-list matching at branch entrances",
+    "expected_verdict": "Do not build as described",
+    "verdict": "Do not build as described",
+    "verdict_ok": true,
+    "dangerous": false,
+    "risk_level": "high",
+    "risk_ok": true,
+    "high_risk_ai": {
+     "got": true,
+     "expected": true
+    },
+    "dpia_required": {
+     "got": true,
+     "expected": true
+    },
+    "key_findings": {
+     "matched": 3,
+     "partial": 0,
+     "missed": 1,
+     "of": 4,
+     "severity_miscalibrated": 1
+    },
+    "must_cite": {
+     "found": [
+      "GDPR Art. 9",
+      "AI Act Annex III"
+     ],
+     "missing": []
+    },
+    "wrong_extras": 0,
+    "faithfulness": 0.9,
+    "cost": 0.0177,
+    "seconds": 125.58,
+    "searches": 12,
+    "rewrites": 4
+   },
+   {
+    "id": "A-017",
+    "domain": "D6",
+    "title": "Payment-holiday hardship evidence and profile records",
+    "expected_verdict": "Proceed with conditions",
+    "verdict": "Do not build as described",
+    "verdict_ok": false,
+    "dangerous": false,
+    "risk_level": "high",
+    "risk_ok": false,
+    "high_risk_ai": {
+     "got": false,
+     "expected": false
+    },
+    "dpia_required": {
+     "got": true,
+     "expected": true
+    },
+    "key_findings": {
+     "matched": 1,
+     "partial": 1,
+     "missed": 2,
+     "of": 4,
+     "severity_miscalibrated": 1
+    },
+    "must_cite": {
+     "found": [
+      "GDPR Art. 9"
+     ],
+     "missing": []
+    },
+    "wrong_extras": 0,
+    "faithfulness": 0.941,
+    "cost": 0.0147,
+    "seconds": 110.81,
+    "searches": 9,
+    "rewrites": 4
+   },
+   {
+    "id": "A-018",
+    "domain": "D6",
+    "title": "Religion inference for festival marketing",
+    "expected_verdict": "Do not build as described",
+    "verdict": "Do not build as described",
+    "verdict_ok": true,
+    "dangerous": false,
+    "risk_level": "high",
+    "risk_ok": true,
+    "high_risk_ai": {
+     "got": false,
+     "expected": false
+    },
+    "dpia_required": {
+     "got": true,
+     "expected": true
+    },
+    "key_findings": {
+     "matched": 3,
+     "partial": 1,
+     "missed": 0,
+     "of": 4,
+     "severity_miscalibrated": 0
+    },
+    "must_cite": {
+     "found": [
+      "GDPR Art. 9"
+     ],
+     "missing": []
+    },
+    "wrong_extras": 0,
+    "faithfulness": 0.75,
+    "cost": 0.0122,
+    "seconds": 73.56,
+    "searches": 5,
+    "rewrites": 3
+   },
+   {
+    "id": "A-019",
+    "domain": "D7",
+    "title": "Customer spending profile (12-month transaction charts)",
+    "expected_verdict": "Proceed",
+    "verdict": "Proceed with conditions",
+    "verdict_ok": false,
+    "dangerous": false,
+    "risk_level": "medium",
+    "risk_ok": false,
+    "high_risk_ai": {
+     "got": false,
+     "expected": false
+    },
+    "dpia_required": {
+     "got": false,
+     "expected": false
+    },
+    "key_findings": {
+     "matched": 2,
+     "partial": 0,
+     "missed": 1,
+     "of": 3,
+     "severity_miscalibrated": 1
+    },
+    "must_cite": {
+     "found": [
+      "GDPR Art. 6"
+     ],
+     "missing": []
+    },
+    "wrong_extras": 0,
+    "faithfulness": 0.762,
+    "cost": 0.016,
+    "seconds": 89.79,
+    "searches": 8,
+    "rewrites": 1
+   },
+   {
+    "id": "A-020",
+    "domain": "D8",
+    "title": "Self-service account deletion and erasure workflow",
+    "expected_verdict": "Do not build as described",
+    "verdict": "Proceed with conditions",
+    "verdict_ok": false,
+    "dangerous": false,
+    "risk_level": "high",
+    "risk_ok": true,
+    "high_risk_ai": {
+     "got": false,
+     "expected": false
+    },
+    "dpia_required": {
+     "got": false,
+     "expected": false
+    },
+    "key_findings": {
+     "matched": 2,
+     "partial": 2,
+     "missed": 0,
+     "of": 4,
+     "severity_miscalibrated": 0
+    },
+    "must_cite": {
+     "found": [
+      "GDPR Art. 17",
+      "AI Act Art. 26"
+     ],
+     "missing": []
+    },
+    "wrong_extras": 0,
+    "faithfulness": 0.833,
+    "cost": 0.0117,
+    "seconds": 64.57,
+    "searches": 7,
+    "rewrites": 1
+   }
+  ]
+ },
+ "domains": [
+  {
+   "id": "D1",
+   "name": "Automated decisions, profiling",
+   "law": "gdpr",
+   "articles": [
+    {
+     "text": "Art. 22",
+     "law": "gdpr"
+    },
+    {
+     "text": "Rec. 71",
+     "law": "gdpr"
+    },
+    {
+     "text": "Art. 4(4)",
+     "law": "gdpr"
+    },
+    {
+     "text": "Art. 35(3)(a)",
+     "law": "gdpr"
+    }
+   ]
+  },
+  {
+   "id": "D2",
+   "name": "Data sharing and transfers",
+   "law": "gdpr",
+   "articles": [
+    {
+     "text": "Art. 44–49",
+     "law": "gdpr"
+    },
+    {
+     "text": "Art. 28",
+     "law": "gdpr"
+    },
+    {
+     "text": "Art. 6(4)",
+     "law": "gdpr"
+    }
+   ]
+  },
+  {
+   "id": "D7",
+   "name": "Plainly low-risk features",
+   "law": "gdpr",
+   "articles": [
+    {
+     "text": "Art. 5",
+     "law": "gdpr"
+    },
+    {
+     "text": "Art. 6(1)(f)",
+     "law": "gdpr"
+    },
+    {
+     "text": "Art. 13",
+     "law": "gdpr"
+    }
+   ]
+  },
+  {
+   "id": "D8",
+   "name": "Rights and retention",
+   "law": "gdpr",
+   "articles": [
+    {
+     "text": "Art. 15–18",
+     "law": "gdpr"
+    },
+    {
+     "text": "Art. 17(3)(b)",
+     "law": "gdpr"
+    },
+    {
+     "text": "Rec. 65",
+     "law": "gdpr"
+    },
+    {
+     "text": "Art. 26(6)",
+     "law": "ai"
+    }
+   ]
+  },
+  {
+   "id": "D9",
+   "name": "Legal basis, consent, marketing",
+   "law": "gdpr",
+   "articles": [
+    {
+     "text": "Art. 6",
+     "law": "gdpr"
+    },
+    {
+     "text": "Art. 7",
+     "law": "gdpr"
+    },
+    {
+     "text": "Art. 21",
+     "law": "gdpr"
+    },
+    {
+     "text": "Rec. 47",
+     "law": "gdpr"
+    }
+   ]
+  },
+  {
+   "id": "D5",
+   "name": "HR and hiring",
+   "law": "both",
+   "articles": [
+    {
+     "text": "Annex III 4",
+     "law": "ai"
+    },
+    {
+     "text": "Art. 88",
+     "law": "gdpr"
+    },
+    {
+     "text": "Art. 22",
+     "law": "gdpr"
+    }
+   ]
+  },
+  {
+   "id": "D6",
+   "name": "Special-category data",
+   "law": "both",
+   "articles": [
+    {
+     "text": "Art. 9",
+     "law": "gdpr"
+    },
+    {
+     "text": "Art. 35(3)(b)",
+     "law": "gdpr"
+    },
+    {
+     "text": "Art. 21",
+     "law": "gdpr"
+    }
+   ]
+  },
+  {
+   "id": "D3",
+   "name": "High-risk AI in fintech",
+   "law": "ai",
+   "articles": [
+    {
+     "text": "Art. 6",
+     "law": "ai"
+    },
+    {
+     "text": "Annex III 1, 5",
+     "law": "ai"
+    },
+    {
+     "text": "Art. 25–27",
+     "law": "ai"
+    }
+   ]
+  },
+  {
+   "id": "D4",
+   "name": "AI that is not high-risk",
+   "law": "ai",
+   "articles": [
+    {
+     "text": "Art. 50",
+     "law": "ai"
+    },
+    {
+     "text": "Art. 5",
+     "law": "ai"
+    },
+    {
+     "text": "Art. 6(3)",
+     "law": "ai"
+    }
+   ]
+  }
+ ],
+ "pairs": {
+  "full": [
+   {
+    "a": {
+     "id": "A-002",
+     "text": "a transfer the organisation's facts do not cover",
+     "expected": "safeguards",
+     "article": "Art. 46",
+     "ok": true,
+     "why": ""
+    },
+    "b": {
+     "id": "A-003",
+     "text": "a transfer the facts do cover",
+     "expected": "Covered",
+     "article": "Art. 45",
+     "ok": true,
+     "why": ""
+    },
+    "ok": true
+   },
+   {
+    "a": {
+     "id": "A-003",
+     "text": "fully automatic credit decisions",
+     "expected": "Blocker",
+     "article": "Art. 22",
+     "ok": true,
+     "why": ""
+    },
+    "b": {
+     "id": "A-004",
+     "text": "an analyst takes every decision",
+     "expected": "Covered",
+     "article": "",
+     "ok": true,
+     "why": ""
+    },
+    "ok": true
+   },
+   {
+    "a": {
+     "id": "A-005",
+     "text": "a chatbot that decides nothing",
+     "expected": "tell users",
+     "article": "Art. 50",
+     "ok": true,
+     "why": ""
+    },
+    "b": {
+     "id": "A-006",
+     "text": "the same chatbot deciding refunds",
+     "expected": "Blocker",
+     "article": "Art. 22",
+     "ok": true,
+     "why": ""
+    },
+    "ok": true
+   },
+   {
+    "a": {
+     "id": "A-007",
+     "text": "profiling to pick promotions",
+     "expected": "conditions",
+     "article": "Art. 21, DPIA",
+     "ok": false,
+     "why": "DPIA missed"
+    },
+    "b": {
+     "id": "A-019",
+     "text": "the customer's own spending page",
+     "expected": "Proceed",
+     "article": "",
+     "ok": false,
+     "why": "conditions"
+    },
+    "ok": false
+   },
+   {
+    "a": {
+     "id": "A-008",
+     "text": "a vendor on our instructions",
+     "expected": "Proceed",
+     "article": "Art. 28",
+     "ok": false,
+     "why": "conditions"
+    },
+    "b": {
+     "id": "A-009",
+     "text": "the vendor trains on the data",
+     "expected": "Do not build",
+     "article": "Art. 6(4)",
+     "ok": false,
+     "why": "conditions, DPIA missed"
+    },
+    "ok": false
+   },
+   {
+    "a": {
+     "id": "A-010",
+     "text": "fraud detection on transactions",
+     "expected": "not high-risk",
+     "article": "Annex III 5(b)",
+     "ok": true,
+     "why": ""
+    },
+    "b": {
+     "id": "A-011",
+     "text": "the same model for overdraft limits",
+     "expected": "high-risk",
+     "article": "FRIA",
+     "ok": true,
+     "why": ""
+    },
+    "ok": true
+   },
+   {
+    "a": {
+     "id": "A-012",
+     "text": "a one-to-one selfie check",
+     "expected": "conditions",
+     "article": "Art. 9 consent",
+     "ok": false,
+     "why": "Do not build"
+    },
+    "b": {
+     "id": "A-016",
+     "text": "face-matching every visitor",
+     "expected": "Do not build",
+     "article": "Art. 9",
+     "ok": true,
+     "why": ""
+    },
+    "ok": false
+   },
+   {
+    "a": {
+     "id": "A-013",
+     "text": "CV screening that auto-rejects",
+     "expected": "Blocker",
+     "article": "Art. 22",
+     "ok": true,
+     "why": ""
+    },
+    "b": {
+     "id": "A-014",
+     "text": "a recruiter reads and decides",
+     "expected": "Covered",
+     "article": "",
+     "ok": true,
+     "why": ""
+    },
+    "ok": true
+   }
+  ],
+  "full_right": {
+   "right": 5,
+   "of": 8
+  },
+  "quick": [
+   {
+    "a": {
+     "e3_id": "Q-001",
+     "e5_id": "K-001",
+     "text": "automated decisions",
+     "article": "Art. 22",
+     "e3": true,
+     "e5": true
+    },
+    "b": {
+     "e3_id": "Q-002",
+     "e5_id": "K-002",
+     "text": "legitimate interests",
+     "article": "Art. 6(1)(f)",
+     "e3": true,
+     "e5": true
+    },
+    "e3": true,
+    "e5": true
+   },
+   {
+    "a": {
+     "e3_id": "Q-004",
+     "e5_id": "K-004",
+     "text": "appropriate safeguards",
+     "article": "Art. 46",
+     "e3": true,
+     "e5": false
+    },
+    "b": {
+     "e3_id": "Q-005",
+     "e5_id": "K-005",
+     "text": "an adequacy decision",
+     "article": "Art. 45",
+     "e3": true,
+     "e5": true
+    },
+    "e3": true,
+    "e5": false
+   },
+   {
+    "a": {
+     "e3_id": "Q-007",
+     "e5_id": "K-007",
+     "text": "high-risk AI",
+     "article": "Annex III",
+     "e3": true,
+     "e5": true
+    },
+    "b": {
+     "e3_id": "Q-008",
+     "e5_id": "K-008",
+     "text": "a prohibited practice",
+     "article": "Art. 5",
+     "e3": true,
+     "e5": false
+    },
+    "e3": true,
+    "e5": false
+   },
+   {
+    "a": {
+     "e3_id": "Q-015",
+     "e5_id": "K-015",
+     "text": "a DPIA",
+     "article": "Art. 35",
+     "e3": true,
+     "e5": true
+    },
+    "b": {
+     "e3_id": "Q-016",
+     "e5_id": "K-016",
+     "text": "prior consultation",
+     "article": "Art. 36",
+     "e3": true,
+     "e5": true
+    },
+    "e3": true,
+    "e5": true
+   },
+   {
+    "a": {
+     "e3_id": "Q-017",
+     "e5_id": "K-017",
+     "text": "erasure",
+     "article": "Art. 17",
+     "e3": true,
+     "e5": true
+    },
+    "b": {
+     "e3_id": "Q-018",
+     "e5_id": "K-018",
+     "text": "restriction",
+     "article": "Art. 18",
+     "e3": true,
+     "e5": true
+    },
+    "e3": true,
+    "e5": true
+   }
+  ],
+  "quick_e3": {
+   "right": 5,
+   "of": 5
+  },
+  "quick_e5": {
+   "right": 3,
+   "of": 5
+  },
+  "routing": [
+   {
+    "a": {
+     "id": "R-008",
+     "text": "reads like a feature",
+     "route": "quick",
+     "ok": true
+    },
+    "b": {
+     "id": "R-011",
+     "text": "a feature as a question",
+     "route": "full",
+     "ok": true
+    },
+    "ok": true
+   },
+   {
+    "a": {
+     "id": "R-009",
+     "text": "asks about the register",
+     "route": "quick",
+     "ok": true
+    },
+    "b": {
+     "id": "R-024",
+     "text": "asks to check the register",
+     "route": "full",
+     "ok": true
+    },
+    "ok": true
+   },
+   {
+    "a": {
+     "id": "R-037",
+     "text": "an injection as a question",
+     "route": "reject",
+     "ok": true
+    },
+    "b": {
+     "id": "R-038",
+     "text": "the honest version",
+     "route": "full",
+     "ok": true
+    },
+    "ok": true
+   }
+  ],
+  "routing_right": {
+   "right": 3,
+   "of": 3
+  }
+ },
+ "cost": [
+  {
+   "set": "E12",
+   "label": "E1 · E2",
+   "harness": 0.0066,
+   "gateway": 0.02,
+   "cases": 45
+  },
+  {
+   "set": "E7",
+   "label": "E7",
+   "harness": 0,
+   "gateway": 0.01,
+   "cases": 4
+  },
+  {
+   "set": "E3",
+   "label": "E3 · E4",
+   "harness": 0.0088,
+   "gateway": 0.1,
+   "cases": 20
+  },
+  {
+   "set": "E5",
+   "label": "E5",
+   "harness": 0.0325,
+   "gateway": 0.07,
+   "cases": 15
+  },
+  {
+   "set": "E6",
+   "label": "E6",
+   "harness": 0.3115,
+   "gateway": 0.76,
+   "cases": 20
+  }
+ ],
+ "notes": {
+  "title": "Evaluation report · run of 27 October 2026",
+  "headline": "The assistant finds the right law and never misses dangerously; where it falls short it puts the right finding one severity step too high or too low.",
+  "summary": "Routing, screens and the output guardrail are clean. Retrieval meets its target and the agentic loop finds three queries a single search misses. Quick answers cite the right article in 13 of 15 and stay within three sentences. All 20 feature descriptions reached the DPO's pause with an assessment, the high-risk AI flag right every time and no dangerous miss. Where the assistant falls short, it is on the severity of findings it has otherwise got right.",
+  "gateway_cost": {
+   "E12": 0.02,
+   "E7": 0.01,
+   "E3": 0.1,
+   "E5": 0.07,
+   "E6": 0.76,
+   "note": "OpenRouter activity page, 27 Oct; the harness prices tokens only, the reranker (about $0.002 a call, roughly 170 calls in E6) and the embeddings are the difference. A first E5 run on the shared retrieval set ($0.32) was superseded by the run on E5's own set."
+  },
+  "failure_modes": [
+   {
+    "title": "Severity one step off",
+    "text": "All seven wrong verdicts are one step from the expected one, never two and never in the dangerous direction; 7 of the 12 missed findings make the right point with the right provision and only the wrong label.",
+    "example": "A-001, a recently-viewed strip inside the customer's own account, expected Proceed: \"Required: document a lawful basis for recording and displaying viewed products … assess and document the balance before launch (GDPR Art. 6(1), Rec. 47)\".",
+    "cases": [
+     "A-001",
+     "A-008",
+     "A-019",
+     "A-009",
+     "A-012",
+     "A-017",
+     "A-020"
+    ],
+    "response": "Acceptable: the DPO can move a finding one step at the pause, and no verdict was two steps off or in the dangerous direction.",
+    "response_kind": "acceptable"
+   },
+   {
+    "title": "Special-category data as a Blocker where a consent route exists",
+    "text": "Selfie verification with a video-call alternative (A-012) and a doctor's note for a payment holiday (A-017) expected a Required Art. 9(2)(a) finding and got a Blocker: the assistant treats a consent the description does not yet establish as a design fault rather than a condition. A reasonable DPO could read it either way; these rows go to the human expert.",
+    "example": "A-012, finding 1: \"Blocker: do not run it unless customers give valid, informed, specific and freely given explicit consent (GDPR Art. 9(1), 9(2))\".",
+    "cases": [
+     "A-012",
+     "A-017"
+    ],
+    "response": "Resolved by the human in the loop: the DPO decides whether the consent route exists and lowers the finding to Required.",
+    "response_kind": "existing solution"
+   },
+   {
+    "title": "The verdict field milder than the text",
+    "text": "A-009 and A-020 expected Do not build and got Proceed with conditions, yet both summaries open with a stop. The findings carry the substance; the structured verdict lags the prose.",
+    "example": "A-020 summary: \"Do not implement an unconditional, immediate wipe: erasure rights do not override personal-data retention required by law\"; verdict field: Proceed with conditions.",
+    "cases": [
+     "A-009",
+     "A-020"
+    ],
+    "response": "Caught by the DPO, who reads the summary beside the verdict field and sets the verdict at the pause; a guardrail rule could catch it earlier.",
+    "response_kind": "existing solution"
+   },
+   {
+    "title": "Umbrella article where the paragraph was asked",
+    "text": "Most of the ten partial findings cite \"GDPR Art. 5\" for minimisation or storage limitation where 5(1)(c) or 5(1)(e) was expected, or state the fraud carve-out and \"not high-risk\" without the Annex III citation. The worker's rule \"cite the most specific label the tools returned\" did not reach these.",
+    "example": "A-017, findings 3 and 4: minimum proof, retention and erasure, both cited as \"GDPR Art. 5\".",
+    "cases": [
+     "A-005",
+     "A-006",
+     "A-010",
+     "A-012",
+     "A-017",
+     "A-018",
+     "A-020"
+    ],
+    "response": "Harmless to the DPO, who sees the point and the article; it costs the partial score only.",
+    "response_kind": "acceptable"
+   },
+   {
+    "title": "AI Act Art. 5 is the corpus's weak spot",
+    "text": "Missed by the single pass in E3 twice, by the loop once, and by both E5 questions that needed it: the article's chunks are long and the recitals that paraphrase it (Rec. 30, Rec. 31) outrank it. A corpus-side fix (shorter chunks, a heading that names the practices) belongs to the embedding and chunking study after the capstone.",
+    "example": "K-008, social scoring: answered correctly from Rec. 31, without the Art. 5 chunk.",
+    "cases": [
+     "Q-008",
+     "Q-014",
+     "K-004",
+     "K-008"
+    ],
+    "response": "A corpus fix: shorter chunks for Art. 5 with a heading that names the practices, so the article outranks the recitals that paraphrase it.",
+    "response_kind": "proposed fix"
+   }
+  ],
+  "judge_note": "The target was written as 17 of 20 on the assumption of 20 scorable rows; with 4 unsure rows left out, 13 of 15 is 0.87 against 0.85. In both disagreements the judge was the more generous reader, so 0.73 matched is if anything slightly generous; the judge was strict in one systematic way, counting a point made only in the summary as absent (A-007 KF1). The unsure rows and the disagreements go to the human expert in round 3.",
+  "limitations": [
+   "One run per case, 20 cases, 15 questions: the numbers locate failure modes, they do not give confidence intervals; a second run would move the verdict count by one or two (A-003 varied 4 to 5 of 5 across four rehearsal runs).",
+   "The test data was reviewed by an AI model acting as the domain expert (two rounds); the human expert's review is pending, and the DPIA (A-007, A-009) and Art. 9 severity (A-012, A-017) expectations are the ones most likely to move.",
+   "The reviser (E9) and the memory's effect on later assessments are not measured here; pytest and the demo cover the mechanics. The model-dependence run on Mistral Large 4 was not made."
+  ],
+  "next": [
+   "Nothing in the app was changed in response to these numbers, by the rule set before the run.",
+   "A short severity-calibration passage in the worker prompt, one example per severity written from the rubric's definitions rather than from these cases, tested on a fresh set.",
+   "Corpus side: the chunking of AI Act Art. 5.",
+   "Round 3 with the human expert: the unsure rows, the two disagreements, and the contested expectations (A-007, A-009 DPIA; A-012, A-017 Art. 9; A-010 Art. 22 on an automated hold)."
+  ],
+  "intro": "Seven sets, each testing one part of the assistant on its own test data, run once on the models the app ships with. Three sets test the guardrails around the models, two the retrieval of the law, two the whole path from a request to the answer.",
+  "data_note": "The test data is synthetic: written with an AI assistant in the voice of a product manager, checked by the author, who is not a compliance professional, and reviewed in two rounds by a second AI model acting as the domain expert. A human expert's review is pending, so the expected answers are a careful draft, not a certified reference.",
+  "shortfalls_intro": "Two of the ten targets were not met, both in the full assessments: verdict accuracy (13 of 20 against 0.80) and key findings matched (59 of 81 against 0.75). Two DPIA flags were also missed. The failure modes below explain them; the first one accounts for most of the gap."
+ },
+ "not_met": [
+  {
+   "set": "E6",
+   "key": "verdict",
+   "label": "verdict accuracy",
+   "definition": "Cases whose verdict (Do not build as described, Proceed with conditions, Proceed) equals the expected one.",
+   "result": "13 of 20",
+   "value": 0.65,
+   "target": "≥ 0.80",
+   "met": false,
+   "detail": [
+    "A-001 (Proceed → Conditions)",
+    "A-008 (Proceed → Conditions)",
+    "A-009 (Do not build → Conditions)",
+    "A-012 (Conditions → Do not build)",
+    "A-017 (Conditions → Do not build)",
+    "A-019 (Proceed → Conditions)",
+    "A-020 (Do not build → Conditions)"
+   ]
+  },
+  {
+   "set": "E6",
+   "key": "key_findings",
+   "label": "key findings matched · partial · missed",
+   "definition": "Expected key findings the judge found in the assessment: matched (same point, the expected provision at the asked level or an accepted alternative, the exact severity), partial (same point and severity, provision missing or at the wrong level), missed (point absent, or the severity wrong).",
+   "result": "59 · 10 · 12 of 81",
+   "value": 0.728,
+   "target": "≥ 0.75",
+   "met": false,
+   "detail": []
+  }
+ ]
+}

@@ -1,0 +1,36 @@
+# The API image: FastAPI + LangGraph over Postgres (the `db` service), served by uvicorn on 8000.
+# Build context is the project root (docker-compose.yml builds it); .dockerignore keeps secrets, caches and
+# the front end out.  The start script waits for the database, creates the schema, seeds on first start and
+# then serves (scripts/container_start.py).  Python 3.12, as TECHNICAL.md states.
+FROM python:3.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
+
+WORKDIR /app
+
+# dependencies first, so a code change does not reinstall them
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+# the application: agent, API, config, corpus ingestion, scripts, the evaluation report's hand-written notes
+COPY compliance_agent ./compliance_agent
+COPY api ./api
+COPY config ./config
+COPY ingest ./ingest
+COPY scripts ./scripts
+COPY eval/harness ./eval/harness
+COPY eval/data ./eval/data
+COPY eval/report/notes.json ./eval/report/notes.json
+COPY eval/__init__.py ./eval/__init__.py
+
+# the EUR-Lex HTML cache and the evaluation results are bind-mounted by docker-compose.yml (data/, eval/results/)
+RUN mkdir -p data/corpus/raw eval/results && useradd --create-home --uid 1000 app && chown -R app:app /app
+USER app
+
+EXPOSE 8000
+HEALTHCHECK --interval=15s --timeout=5s --start-period=120s --retries=5 \
+    CMD python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/api/healthz', timeout=4).status == 200 else 1)"
+
+CMD ["python", "scripts/container_start.py"]

@@ -1,0 +1,7 @@
+-r requirements.txt
+pytest>=8.0
+pytest-cov>=5.0                  # pytest tests --cov=compliance_agent --cov=api (TECHNICAL.md, Tests)
+# ragas was dropped on 26 Oct (eval/README.md section 1): its pins would downgrade the app's openai / langchain-openai;
+# faithfulness is implemented in the harness on the `judge` slot with the same definition.
+# Optional, only for scripts/eval_pdf.py (prints the Evaluation page to eval/report/evaluation.pdf):
+#   pip install playwright && playwright install chromium

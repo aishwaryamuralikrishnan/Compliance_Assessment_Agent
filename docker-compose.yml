@@ -1,0 +1,76 @@
+# Three containers, one command:  docker compose up --build
+#
+#   db    Postgres 16 with pgvector (the checkpointer, the long-term store, the register, the embedded corpus)
+#   api   FastAPI + LangGraph (Dockerfile.api); waits for db, creates the schema, seeds on first start, serves :8000
+#   web   the Next.js front end (web/Dockerfile), serves :3000 and proxies /api/* to the api container
+#
+# Secrets and passwords come from `.env` next to this file (copy .env.example): OPENROUTER_API_KEY (the corpus
+# is embedded through the gateway on first start), SEED_PM_PASSWORD and SEED_DPO_PASSWORD (the two demo
+# accounts), SESSION_SECRET (the login cookie).  DATABASE_URL is set here to the db container and overrides the
+# localhost value of .env.  First start takes a few minutes (download, chunk and embed the two regulations);
+# every later start is seconds.  `docker compose down -v` wipes the database, and the next start seeds again.
+#
+# Only the database, for running the API and the front end on your own machine as before:
+#   docker compose up db
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: compliance_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-compliance}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-compliance}
+      POSTGRES_DB: ${POSTGRES_DB:-compliance}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      # Named volume: thread checkpoints, long-term memory, register entries and the
+      # embedded corpus survive `docker compose down`. `docker compose down -v` wipes it.
+      - compliance_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-compliance} -d ${POSTGRES_DB:-compliance}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: compliance_api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-compliance}:${POSTGRES_PASSWORD:-compliance}@db:5432/${POSTGRES_DB:-compliance}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:?set OPENROUTER_API_KEY in .env or the environment}
+      OPENROUTER_BASE_URL: ${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}
+      SEED_PM_PASSWORD: ${SEED_PM_PASSWORD:-}
+      SEED_DPO_PASSWORD: ${SEED_DPO_PASSWORD:-}
+      SESSION_SECRET: ${SESSION_SECRET:-}
+      SEED_ON_START: ${SEED_ON_START:-1}
+      LANGSMITH_TRACING: ${LANGSMITH_TRACING:-false}
+      LANGSMITH_API_KEY: ${LANGSMITH_API_KEY:-}
+      LANGSMITH_PROJECT: ${LANGSMITH_PROJECT:-compliance-assistant}
+    ports:
+      - "8000:8000"                      # http://localhost:8000/docs
+    volumes:
+      - ./data:/app/data                 # the EUR-Lex HTML cache, so a re-seed does not download again
+      - ./eval/results:/app/eval/results:ro   # the evaluation runs the public report reads
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+      args:
+        API_URL: http://api:8000         # where /api/* is proxied to; fixed at build time (next.config.ts)
+    container_name: compliance_web
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "3000:3000"                      # http://localhost:3000
+
+volumes:
+  compliance_pgdata:

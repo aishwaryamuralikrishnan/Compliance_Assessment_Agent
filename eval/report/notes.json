@@ -1,0 +1,97 @@
+{
+  "title": "Evaluation report · run of 27 October 2026",
+  "headline": "The assistant finds the right law and never misses dangerously; where it falls short it puts the right finding one severity step too high or too low.",
+  "summary": "Routing, screens and the output guardrail are clean. Retrieval meets its target and the agentic loop finds three queries a single search misses. Quick answers cite the right article in 13 of 15 and stay within three sentences. All 20 feature descriptions reached the DPO's pause with an assessment, the high-risk AI flag right every time and no dangerous miss. Where the assistant falls short, it is on the severity of findings it has otherwise got right.",
+  "gateway_cost": {
+    "E12": 0.02,
+    "E7": 0.01,
+    "E3": 0.1,
+    "E5": 0.07,
+    "E6": 0.76,
+    "note": "OpenRouter activity page, 27 Oct; the harness prices tokens only, the reranker (about $0.002 a call, roughly 170 calls in E6) and the embeddings are the difference. A first E5 run on the shared retrieval set ($0.32) was superseded by the run on E5's own set."
+  },
+  "failure_modes": [
+    {
+      "title": "Severity one step off",
+      "text": "All seven wrong verdicts are one step from the expected one, never two and never in the dangerous direction; 7 of the 12 missed findings make the right point with the right provision and only the wrong label.",
+      "example": "A-001, a recently-viewed strip inside the customer's own account, expected Proceed: \"Required: document a lawful basis for recording and displaying viewed products … assess and document the balance before launch (GDPR Art. 6(1), Rec. 47)\".",
+      "cases": [
+        "A-001",
+        "A-008",
+        "A-019",
+        "A-009",
+        "A-012",
+        "A-017",
+        "A-020"
+      ],
+      "response": "Acceptable: the DPO can move a finding one step at the pause, and no verdict was two steps off or in the dangerous direction.",
+      "response_kind": "acceptable"
+    },
+    {
+      "title": "Special-category data as a Blocker where a consent route exists",
+      "text": "Selfie verification with a video-call alternative (A-012) and a doctor's note for a payment holiday (A-017) expected a Required Art. 9(2)(a) finding and got a Blocker: the assistant treats a consent the description does not yet establish as a design fault rather than a condition. A reasonable DPO could read it either way; these rows go to the human expert.",
+      "example": "A-012, finding 1: \"Blocker: do not run it unless customers give valid, informed, specific and freely given explicit consent (GDPR Art. 9(1), 9(2))\".",
+      "cases": [
+        "A-012",
+        "A-017"
+      ],
+      "response": "Resolved by the human in the loop: the DPO decides whether the consent route exists and lowers the finding to Required.",
+      "response_kind": "existing solution"
+    },
+    {
+      "title": "The verdict field milder than the text",
+      "text": "A-009 and A-020 expected Do not build and got Proceed with conditions, yet both summaries open with a stop. The findings carry the substance; the structured verdict lags the prose.",
+      "example": "A-020 summary: \"Do not implement an unconditional, immediate wipe: erasure rights do not override personal-data retention required by law\"; verdict field: Proceed with conditions.",
+      "cases": [
+        "A-009",
+        "A-020"
+      ],
+      "response": "Caught by the DPO, who reads the summary beside the verdict field and sets the verdict at the pause; a guardrail rule could catch it earlier.",
+      "response_kind": "existing solution"
+    },
+    {
+      "title": "Umbrella article where the paragraph was asked",
+      "text": "Most of the ten partial findings cite \"GDPR Art. 5\" for minimisation or storage limitation where 5(1)(c) or 5(1)(e) was expected, or state the fraud carve-out and \"not high-risk\" without the Annex III citation. The worker's rule \"cite the most specific label the tools returned\" did not reach these.",
+      "example": "A-017, findings 3 and 4: minimum proof, retention and erasure, both cited as \"GDPR Art. 5\".",
+      "cases": [
+        "A-005",
+        "A-006",
+        "A-010",
+        "A-012",
+        "A-017",
+        "A-018",
+        "A-020"
+      ],
+      "response": "Harmless to the DPO, who sees the point and the article; it costs the partial score only.",
+      "response_kind": "acceptable"
+    },
+    {
+      "title": "AI Act Art. 5 is the corpus's weak spot",
+      "text": "Missed by the single pass in E3 twice, by the loop once, and by both E5 questions that needed it: the article's chunks are long and the recitals that paraphrase it (Rec. 30, Rec. 31) outrank it. A corpus-side fix (shorter chunks, a heading that names the practices) belongs to the embedding and chunking study after the capstone.",
+      "example": "K-008, social scoring: answered correctly from Rec. 31, without the Art. 5 chunk.",
+      "cases": [
+        "Q-008",
+        "Q-014",
+        "K-004",
+        "K-008"
+      ],
+      "response": "A corpus fix: shorter chunks for Art. 5 with a heading that names the practices, so the article outranks the recitals that paraphrase it.",
+      "response_kind": "proposed fix"
+    }
+  ],
+  "judge_note": "The target was written as 17 of 20 on the assumption of 20 scorable rows; with 4 unsure rows left out, 13 of 15 is 0.87 against 0.85. In both disagreements the judge was the more generous reader, so 0.73 matched is if anything slightly generous; the judge was strict in one systematic way, counting a point made only in the summary as absent (A-007 KF1). The unsure rows and the disagreements go to the human expert in round 3.",
+  "limitations": [
+    "One run per case, 20 cases, 15 questions: the numbers locate failure modes, they do not give confidence intervals; a second run would move the verdict count by one or two (A-003 varied 4 to 5 of 5 across four rehearsal runs).",
+    "The test data was reviewed by an AI model acting as the domain expert (two rounds); the human expert's review is pending, and the DPIA (A-007, A-009) and Art. 9 severity (A-012, A-017) expectations are the ones most likely to move.",
+    "The reviser (E9) and the memory's effect on later assessments are not measured here; pytest and the demo cover the mechanics. The model-dependence run on Mistral Large 4 was not made."
+  ],
+  "next": [
+    "Nothing in the app was changed in response to these numbers, by the rule set before the run.",
+    "A short severity-calibration passage in the worker prompt, one example per severity written from the rubric's definitions rather than from these cases, tested on a fresh set.",
+    "Corpus side: the chunking of AI Act Art. 5.",
+    "Round 3 with the human expert: the unsure rows, the two disagreements, and the contested expectations (A-007, A-009 DPIA; A-012, A-017 Art. 9; A-010 Art. 22 on an automated hold)."
+  ],
+  "intro": "Seven sets, each testing one part of the assistant on its own test data, run once on the models the app ships with. Three sets test the guardrails around the models, two the retrieval of the law, two the whole path from a request to the answer.",
+  "data_note": "The test data is synthetic: written with an AI assistant in the voice of a product manager, checked by the author, who is not a compliance professional, and reviewed in two rounds by a second AI model acting as the domain expert. A human expert's review is pending, so the expected answers are a careful draft, not a certified reference.",
+  "shortfalls_intro": "Two of the ten targets were not met, both in the full assessments: verdict accuracy (13 of 20 against 0.80) and key findings matched (59 of 81 against 0.75). Two DPIA flags were also missed. The failure modes below explain them; the first one accounts for most of the gap."
+}

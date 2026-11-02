@@ -1,0 +1,139 @@
+# One configuration file, no model names in code.
+#
+# Every node asks the registry (compliance_agent/models.py) for a *slot*; the registry
+# resolves the slot to an OpenRouter model id and builds the client with
+# init_chat_model(model=<id>, model_provider="openai", base_url=OPENROUTER_BASE_URL,
+# api_key=OPENROUTER_API_KEY). The key is read from the environment, never from here.
+#
+# All ids verified on 7 Oct 2026: chat/router ids with `python scripts/list_models.py`,
+# embedding and rerank ids with `python scripts/probe_models.py` (the gateway's /models
+# endpoint does not list those two). Prefer dated versions over "~.../-latest" aliases.
+# Note: the gateway applies a provider guardrail to this key (some providers return
+# "0 endpoints ... matching your guardrail"), which already enforces the no-training
+# provider policy; the `provider` block below is sent in addition.
+
+openrouter:
+  base_url_env: OPENROUTER_BASE_URL          # falls back to https://openrouter.ai/api/v1
+  api_key_env: OPENROUTER_API_KEY
+  # Provider routing sent with every chat request (OpenRouter `provider` preferences).
+  # data_collection: deny  -> only providers that do not train on / retain prompts.
+  # Add `only: [...]` with provider slugs to pin EU/US-hosted providers once you have
+  # checked them in the gateway; leave empty to let OpenRouter choose among compliant ones.
+  # zdr: true → zero data retention; all chat slots and the embeddings satisfy it, the reranker does not and is sent the block without it (rerank.py)
+  provider:
+    data_collection: deny
+    zdr: true
+    only: []
+  # Tag every request so the LangSmith run metadata and the OpenRouter dashboard agree.
+  app_title: compliance-assistant
+
+slots:
+  # Strong worker: plans the assessment, calls the tools, drafts the structured output.
+  # Mid tier (≈ $0.18 / full assessment, measured on the gateway's activity page, 22 Oct): a different vendor and a clearly larger model than the `cheap`
+  # slot, without frontier prices. For bulk harness debugging, point it at the small model temporarily;
+  # the tests themselves never call a model.
+  worker_full:
+    # Development setting (23 Oct 2026): GPT-6 Luna in both worker slots while testing and debugging the evaluation
+    # harness; it is 7-9x cheaper than Mistral Large 4 and does not reason before answering (probe: scripts/probe_slot.py).
+    # Showcase setting: the Mistral lines below; switch back for the rehearsal and the demo, which were tuned on it.
+    model: openai/gpt-6-luna
+    name: GPT-6 Luna
+    # model: mistralai/mistral-large-4-0
+    # name: Mistral Large 4
+    temperature: 0.1
+    max_tokens: 8192        # an Assessment is one tool call; a revision (v1 findings carried over + changes) needs room
+    price: {input: 0.10, output: 0.50, cached_input: 0.01}    # USD per 1M tokens (gateway list price, 23 Oct 2026)
+    # price: {input: 1.36, output: 4.18, cached_input: 0.14}  # Mistral Large 4 (22 Oct 2026; the EU-region endpoint is 10% more)
+    # cached_input: Mistral caches prompt prefixes on its side (implicit, 64-token blocks, cached tokens at 10% of the
+    # input rate); the gateway reports them as cached tokens and the run-stats strip shows them. Nothing to enable.
+    # alternatives (verify with scripts/list_models.py):
+    #   deepseek/deepseek-v4.1-flash-1017   (DeepSeek V4.1 Flash, cheaper, non-EU provider)
+    #   openai/gpt-6-sol                    (GPT-6 Sol, frontier tier, $2 / $10)
+    #   anthropic/claude-sonnet-5.5         (Claude Sonnet 5.5, frontier tier, $2 / $10)
+
+  # Quick worker: simple questions routed as `quick`; same mid tier, short answers.
+  worker_quick:
+    model: openai/gpt-6-luna           # development setting, see worker_full
+    name: GPT-6 Luna
+    # model: mistralai/mistral-large-4-0
+    # name: Mistral Large 4
+    temperature: 0.1
+    max_tokens: 4096        # Mistral reasons before it answers; at 1024 the reasoning used the whole budget and the answer came back empty (23 Oct)
+    price: {input: 0.10, output: 0.50, cached_input: 0.01}
+    # price: {input: 1.36, output: 4.18, cached_input: 0.14}  # Mistral Large 4
+
+  # Small utility model: validate_input classifier, rewrite_query, summariser, reflect (the grader has its own slot below).
+  cheap:
+    # A different vendor from the worker slots on purpose. The probe of 23 Oct (scripts/probe_slot.py): the only models cheaper
+    # than Luna that this account's data policy allows failed (nova-micro, glm-5.3-flash, ministral-8b: no permitted endpoint);
+    # Gemini 3.1 Flash Lite passed json_schema structured output and was the fastest model probed (0.5-0.9 s), which matters
+    # because the grader runs on every retrieval pass. Its calls are tiny, so the difference to Luna is a fraction of a cent per run.
+    model: google/gemini-3.1-flash-lite
+    name: Gemini 3.1 Flash Lite
+    # model: openai/gpt-6-luna          # the previous setting (until 23 Oct 2026)
+    # name: GPT-6 Luna
+    temperature: 0.0
+    max_tokens: 1024
+    price: {input: 0.25, output: 1.50, cached_input: 0.02}    # USD per 1M tokens (gateway list price, 23 Oct 2026)
+    # price: {input: 0.10, output: 0.50}   # GPT-6 Luna
+
+  # Judge: used only by the stage-2 evaluation harness (eval/), never by the app. A third vendor on
+  # purpose, so neither the worker nor the helpers are graded by their own model family.
+  judge:
+    model: anthropic/claude-haiku-5.5
+    name: Claude Haiku 5.5
+    temperature: 0.0
+    max_tokens: 8192        # a batch of ten faithfulness verdicts with reasons, or a five-finding judgement; 2048 truncated the JSON (26 Oct)
+    price: {input: 0.10, output: 0.50}
+
+  # Embeddings: NEVER change after the corpus is indexed (vector column is sized to `dims`).
+  # To change it, run `python -m ingest.seed reindex`.
+  embeddings:
+    model: openai/text-embedding-3-small    # verified: 1536 dims
+    name: Text Embedding 3 Small
+    dims: 1536
+
+  # Cross-encoder reranker used inside search_regulation (top-20 -> top-5).
+  reranker:
+    model: cohere/rerank-4-fast             # verified via POST /rerank (alternative: cohere/rerank-4-pro)
+    name: Rerank 4 Fast
+    endpoint: /rerank                        # relative to base_url; falls back to LLM listwise rerank on error
+    top_n: 5
+
+  # Router behind the `route` node. implementation: jev | llm
+  router:
+    implementation: jev
+    jev:
+      model: typesafe/jev-router
+      name: TypeSafe Jev Router
+      labels: [quick, full, reject]
+      min_confidence: 0.6                    # below this -> full
+    llm:
+      slot: cheap                            # structured output, fallback
+      min_confidence: 0.6
+
+  # Retrieval grader behind grade(query, chunks) -> (sufficient, confidence, relevant_chunk_ids): a chat slot of its
+  # own since 23 Oct 2026, chosen with scripts/probe_grader.py (ten queries: six in plain English, four precise).
+  # Grading is a small reasoning job: the grader must NAME the provision the passages lack, so that the rewrite can
+  # go to it. Measured: GPT-6 Luna named the article every time and resolved five of the six plain-English queries
+  # (Art. 22 for "nobody looks at the declines", Art. 6(4) for the credit-bureau sale, Art. 45/46 for the US partner);
+  # GPT-5.4 mini ($0.75 / $4.50, 8x the price) resolved three and read "nobody looks at the declines" as court
+  # jurisdiction (Art. 81); Gemini 3.1 Flash Lite ($0.25 / $1.50) asked for judgements the law does not state and left
+  # three unresolved. One grade is ~2k tokens in / ~60 out, 8-12 per assessment: about $0.002 per assessment on Luna.
+  #
+  # Why the worker's own model is acceptable here (a question that will come up again): a grader that is the worker's
+  # model would be a problem if it judged the worker's text; this grader doesn't. It judges passages that come from the
+  # database through the embeddings and the reranker, against a ten-word query, and it never sees an assessment. The
+  # independence that matters in this project is the evaluation judge's, which is why Claude Haiku stays out of the app.
+  grader:
+    model: openai/gpt-6-luna
+    name: GPT-6 Luna
+    temperature: 0.0
+    max_tokens: 512
+    price: {input: 0.10, output: 0.50, cached_input: 0.01}    # USD per 1M tokens (gateway list price, 23 Oct 2026)
+    accept_threshold: 0.6                    # the grader's own confidence must reach this; item 8 calibrates it
+
+# Structured-output fallback: if with_structured_output fails for a model, the registry
+# retries with method="function_calling" (see README).
+structured_output:
+  fallback_method: function_calling

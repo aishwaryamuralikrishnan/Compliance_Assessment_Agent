@@ -1,0 +1,29 @@
+# Core agent stack (LangGraph / LangChain 1.x)
+langgraph>=1.0,<2
+langchain>=1.0,<2
+langchain-core>=1.0,<2
+langchain-openai>=1.0,<2
+langgraph-checkpoint-postgres>=3.0,<4
+langsmith>=0.4
+
+# Database
+psycopg[binary,pool]>=3.2
+pgvector>=0.3
+
+# App + config
+fastapi>=0.115                      # the web API (api/), docs/web_app_design.md
+uvicorn[standard]>=0.30
+sse-starlette>=2.1                  # the run event stream (step 2)
+pyjwt>=2.9                          # session cookie
+reportlab>=4.0                      # PDF export of the register
+pydantic>=2.8
+pyyaml>=6.0
+python-dotenv>=1.0
+bcrypt>=4.1
+
+# Corpus ingestion
+requests>=2.32
+beautifulsoup4>=4.12
+lxml>=5.2
+
+# Evaluation (stage 2) lives in requirements-eval.txt
