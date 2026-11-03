@@ -87,7 +87,7 @@ eval/
     judge_faithfulness.md   claims and verdicts
   run_eval.py               python -m eval.run_eval E12|E3|E5|E6|E7|all|check [--ids R-001,R-002] [--limit N]
   harness/                  routing.py · retrieval.py (E3 + E4) · quick.py · assessments.py · faults.py · judge.py · common.py
-  results/<set>_<YYYYMMDD-HHMM>/   cases.jsonl · summary.json · summary.md   (git-ignored; the runs cited in the report are copied into EVALUATION.md)
+  results/<set>_<YYYYMMDD-HHMM>/   cases.jsonl · summary.json · summary.md   (versioned since 2 Nov: the hosted report reads them from the image)
 ```
 
 Commands: `python -m eval.run_eval check` validates the golden files; `E7`, `E12`, `E3` (with E4), `E5`, `E6` run one
@@ -418,6 +418,14 @@ the key-finding rule as stated; the Markdown report per run.
 Also decided (26 Oct, afternoon): `acceptable_alternatives` (and, since 27 Oct, `citation_level`, `merely_extra` and `known_wrong`
 in place of the dropped `severity_tolerance`) are filled by the author for every E6 row by the rules of section 4; the judge-versus-human line stays, scored by
 the author as described in section 6.
+
+Decided 3 Nov (deployment, to-do item 23): the reranker runs as a listwise rerank by the cheap model
+(`reranker.method: llm` in `config/models.yaml`), because the gateway's Rerank 4 Fast has no zero-data-retention
+endpoint and the account's data policy refuses it. E3 and E4 were re-run that day with the new method
+(`results/E3_20261103-1104`, $0.06 on the gateway): recall with the loop 19 of 20 and a single search 16 of 20, the
+same misses as on 27 Oct; the grader's precision 1.0 and recall 0.81 over 27 grades. E5 and E6 keep the numbers of
+27 Oct, measured with the Cohere ranking; the report says so. A second E3 run the same morning found 20 of 20 with
+the loop.
 
 Also decided (26 Oct, evening): faithfulness as an own implementation on the judge slot, rules in section 1.
 

@@ -128,5 +128,14 @@ def test_embeddings_carry_the_provider_policy_in_the_request_body(monkeypatch):
 
     emb.client = type("C", (), {"create": staticmethod(lambda **kw: (seen.update(kw), _Resp())[1])})()
     emb.embed_documents(["x"])
-    assert seen["extra_body"] == {"provider": {"data_collection": "deny"}}
+    assert seen["extra_body"] == {"provider": models._provider_routing()}   # whatever config/models.yaml says (data_collection, zdr)
     models.embeddings.cache_clear()
+
+
+def test_method_llm_skips_the_gateway_reranker(monkeypatch):
+    """`reranker.method: llm` (3 Nov): the cheap model ranks first, the /rerank endpoint is never called."""
+    monkeypatch.setattr(RR.models, "slot_spec", lambda name: {"model": "cohere/rerank-4-fast", "endpoint": "/rerank", "top_n": 2, "method": "llm"})
+    monkeypatch.setattr(RR.requests, "post", lambda *a, **k: (_ for _ in ()).throw(AssertionError("the gateway reranker must not be called")))
+    monkeypatch.setattr(RR.models, "invoke_structured", lambda slot, schema, msgs: RR._Listwise(ranked_indices=[2, 0]))
+    ranked, trace = RR.rerank("q", _chunks(4))
+    assert [c.id for c in ranked] == [2, 0] and trace["method"] == "llm_listwise" and trace["errors"] == []

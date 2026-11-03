@@ -159,6 +159,7 @@ in round 3; her verdict replaces the author's for those rows.
 | E5 (15 questions) | $0.07 | $0.033 | answers $0.006, judge $0.027; the rest is 15 rerank calls |
 | E6 | $0.76 | $0.13 assessments + $0.18 judge | ≈ 170 rerank calls (about $0.34) make up most of the gap |
 | **One full run** | **$0.96** | | against the $4.20 estimated in EVALUATION.md §7 for Mistral Large 4 |
+| E3 + E4, re-run 3 Nov | $0.06 | $0.048 | listwise rerank by the cheap model instead of the gateway's reranker (deployment data policy); recall unchanged at 19 of 20 and 16 of 20, grader precision 1.0, recall 0.81 |
 
 Per E6 case: $0.003–0.010 of worker tokens, 35–126 seconds (mean 76), 4–13 searches. The reranker, at about
 $0.002 a call, is close to half the bill of a full run; the harness prices tokens only, so the gateway's figures

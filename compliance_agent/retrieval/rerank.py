@@ -1,9 +1,10 @@
 """Cross-encoder reranking of the fused top-20 down to top-5.
 
-Primary: the `reranker` slot (Rerank 4 Fast) through the gateway's POST /rerank, which
-reads query and chunk together. Fallback, only if that call fails: a listwise rerank by
-the cheap model with structured output. Last resort: keep the fused order. The result
-says which path ran so the trace is honest about it.
+Primary, when `reranker.method` in config/models.yaml is `api`: the `reranker` slot (Rerank 4 Fast) through the
+gateway's POST /rerank, which reads query and chunk together. With `method: llm` (the setting since 3 Nov: the
+reranker has no zero-data-retention endpoint, so the account's data policy refuses it) the listwise rerank by the
+cheap model with structured output is the first choice; it is otherwise the fallback when the call fails. Last
+resort: keep the fused order. The result says which path ran so the trace is honest about it.
 """
 from __future__ import annotations
 
@@ -85,14 +86,16 @@ def rerank(query: str, chunks: list[RetrievedChunk], top_n: int | None = None) -
     """Returns (top-n chunks in rerank order, trace)."""
     if not chunks:
         return [], {"method": "none", "n_in": 0}
-    top_n = top_n or int(models.slot_spec("reranker").get("top_n", 5))
+    spec = models.slot_spec("reranker")
+    top_n = top_n or int(spec.get("top_n", 5))
     errors: list[str] = []
-    try:
-        ranked = _rerank_api(query, chunks, top_n)
-        return ranked, {"method": "rerank_api", "model": models.slot_spec("reranker")["model"], "n_in": len(chunks),
-                        "top": [(c.citation, c.rerank_score) for c in ranked]}
-    except Exception as exc:
-        errors.append(f"rerank_api: {exc}")
+    if spec.get("method", "api") == "api":            # method: llm skips the gateway's reranker (no zero-retention endpoint, 3 Nov)
+        try:
+            ranked = _rerank_api(query, chunks, top_n)
+            return ranked, {"method": "rerank_api", "model": spec["model"], "n_in": len(chunks),
+                            "top": [(c.citation, c.rerank_score) for c in ranked]}
+        except Exception as exc:
+            errors.append(f"rerank_api: {exc}")
     try:
         ranked = _rerank_llm(query, chunks, top_n)
         return ranked, {"method": "llm_listwise", "n_in": len(chunks), "errors": errors,

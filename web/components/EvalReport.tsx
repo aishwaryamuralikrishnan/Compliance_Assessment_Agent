@@ -561,10 +561,12 @@ export const TABS = [
 ];
 
 export function ReportHeader({ r }: { r: EvalReport }) {
+  const dates = Array.from(new Set(Object.values(r.runs).map((x) => x.timestamp.slice(0, 10)))).sort();
+  const when = dates.length > 1 ? `runs of ${dates.join(", ")}` : `run of ${r.run_date}`;
   return (
     <div>
       <h2 style={{ fontSize: 22, fontWeight: 700, margin: 0 }}>{r.notes?.title || "Evaluation report"}</h2>
-      <p className="muted" style={{ margin: "4px 0 0 0" }}>Compliance Assistant · run of {r.run_date} · build <span className="mono">{r.commit}</span>{r.missing_sets.length ? ` · not run: ${r.missing_sets.join(", ")}` : ""}</p>
+      <p className="muted" style={{ margin: "4px 0 0 0" }}>Compliance Assistant · {when} · build <span className="mono">{r.commit}</span>{r.missing_sets.length ? ` · not run: ${r.missing_sets.join(", ")}` : ""}</p>
     </div>
   );
 }

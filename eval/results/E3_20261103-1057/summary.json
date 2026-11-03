@@ -1,0 +1,105 @@
+{
+ "header": {
+  "set": "E3",
+  "timestamp": "2026-11-03T09:57:22+00:00",
+  "commit": "68ee851",
+  "models": {
+   "worker_full": "openai/gpt-6-luna",
+   "worker_quick": "openai/gpt-6-luna",
+   "cheap": "google/gemini-3.1-flash-lite",
+   "judge": "anthropic/claude-haiku-5.5",
+   "embeddings": "openai/text-embedding-3-small",
+   "reranker": "cohere/rerank-4-fast",
+   "router": "typesafe/jev-router",
+   "grader": "openai/gpt-6-luna"
+  },
+  "database": "localhost/compliance_eval",
+  "host": "LAPTOP-HQB74870"
+ },
+ "cases": 20,
+ "recall_loop": {
+  "found": 20,
+  "of": 20
+ },
+ "recall_single": {
+  "found": 15,
+  "of": 20
+ },
+ "nice_recall_loop": {
+  "found": 20,
+  "of": 39
+ },
+ "attempts_mean": 1.65,
+ "rewrites_total": 13,
+ "insufficient": [
+  "Q-005",
+  "Q-008"
+ ],
+ "loop_misses": [],
+ "single_misses": [
+  "Q-005: GDPR Art. 45",
+  "Q-006: GDPR Art. 6",
+  "Q-013: GDPR Art. 9",
+  "Q-014: AI Act Art. 5",
+  "Q-019: GDPR Art. 5"
+ ],
+ "cost": 0.0215,
+ "grader": {
+  "tp": 16,
+  "fp": 0,
+  "fn": 11,
+  "tn": 6,
+  "grades": 33,
+  "precision": 1.0,
+  "recall": 0.59,
+  "confidence_min_median_max": [
+   0.88,
+   0.98,
+   1.0
+  ],
+  "sweep": [
+   {
+    "threshold": 0.5,
+    "false_pass": 0,
+    "false_fail": 11,
+    "accepted": 16,
+    "of": 33
+   },
+   {
+    "threshold": 0.6,
+    "false_pass": 0,
+    "false_fail": 11,
+    "accepted": 16,
+    "of": 33
+   },
+   {
+    "threshold": 0.7,
+    "false_pass": 0,
+    "false_fail": 11,
+    "accepted": 16,
+    "of": 33
+   },
+   {
+    "threshold": 0.8,
+    "false_pass": 0,
+    "false_fail": 11,
+    "accepted": 16,
+    "of": 33
+   },
+   {
+    "threshold": 0.9,
+    "false_pass": 0,
+    "false_fail": 11,
+    "accepted": 16,
+    "of": 33
+   },
+   {
+    "threshold": 0.95,
+    "false_pass": 0,
+    "false_fail": 13,
+    "accepted": 14,
+    "of": 33
+   }
+  ]
+ }
+}

@@ -26,7 +26,7 @@ compliance_agent/           the agent package (knows nothing of the UI)
 ingest/                     EUR-Lex download / manual-save adoption, legal-structure chunker, seed script
 config/                     models.yaml (slots + prices), roles.yaml (permissions, memory policy), corpus.yaml
 scripts/                    check_env, list_models, probe_models, probe_slot, probe_grader, probe_provider (the gateway's data policy per call), search, chat, admin, draw_graph (the compiled graph as Mermaid), expert_round2 (the reviewer's pack), eval_pdf (the Evaluation page as PDF), container_start (what the api container runs)
-eval/                       the evaluation harness (eval/README.md): data/ golden sets, harness/ runners + report.py, prompts/ judge, report/ notes.json + evaluation.pdf, results/ (not versioned)
+eval/                       the evaluation harness (eval/README.md): data/ golden sets, harness/ runners + report.py, prompts/ judge, report/ notes.json + evaluation.pdf, results/ (the runs the report reads; versioned since 2 Nov for the hosted report)
 tests/                      pytest; graph flows run on a scratch database with a canned corpus
 docker-compose.yml          three containers: db (pgvector/pgvector:pg16 on a named volume), api (Dockerfile.api), web (web/Dockerfile); docs/containers_design.md
 ```

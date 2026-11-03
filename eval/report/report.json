@@ -1,8 +1,8 @@
 {
- "generated_at": "2026-10-29T15:18:09+00:00",
+ "generated_at": "2026-11-03T10:13:22+00:00",
  "results_dir": "/home/claude/proj/eval/results/real",
  "commit": "6fc8bad",
- "run_date": "2026-10-27",
+ "run_date": "2026-11-03",
  "models": {
   "worker_full": "openai/gpt-6-luna",
   "worker_quick": "openai/gpt-6-luna",
@@ -27,8 +27,8 @@
    "cases": 4
   },
   "E3": {
-   "folder": "E3_20261027-1530",
-   "timestamp": "2026-10-27T14:30:49+00:00",
+   "folder": "E3_20261103-1104",
+   "timestamp": "2026-11-03T10:04:15+00:00",
    "cases": 20
   },
   "E5": {
@@ -183,7 +183,7 @@
     {
      "id": "E3",
      "name": "Retrieval",
-     "what": "Whether the search tool finds the right provisions for a plain-English query, and what the agentic loop (grade the passages, rewrite the query, search again) adds over a single search.",
+     "what": "Whether the search tool finds the right provisions for a plain-English query, and what the agentic loop (grade the passages, rewrite the query, search again) adds over a single search. Since 3 November the twenty candidate passages are ranked by the cheap model (listwise) rather than by the gateway's reranker, which offers no zero-data-retention endpoint.",
      "data": "20 queries over nine areas of the two regulations, each with the provisions that must be among the five passages returned; every query is run twice, with the loop and with one ungraded search.",
      "judged": {
       "rules": "the expected provision is among the five passages",
@@ -232,7 +232,7 @@
        "key": "attempts",
        "label": "searches per query · rewrites",
        "definition": "Searches the loop made per query on average, and query rewrites in all.",
-       "result": "1.45 · 9",
+       "result": "1.35 · 7",
        "value": null,
        "target": null,
        "met": null,
@@ -242,8 +242,8 @@
        "key": "nice",
        "label": "nice-to-retrieve recall@5",
        "definition": "Share of nice-to-retrieve provisions found; reported, not scored.",
-       "result": "24 of 39",
-       "value": 0.615,
+       "result": "21 of 39",
+       "value": 0.538,
        "target": null,
        "met": null,
        "detail": []
@@ -255,7 +255,7 @@
      "id": "E4",
      "name": "Grader",
      "what": "Whether the grader that decides 'enough, stop searching' is right: it should say sufficient when a must-retrieve provision is among the passages and not otherwise.",
-     "data": "Every grade the loop made during E3 (29), compared with the truth of whether a must-retrieve provision was present, together with the confidence the grader gave each one.",
+     "data": "Every grade the loop made during the E3 run, compared with the truth of whether a must-retrieve provision was present, together with the confidence the grader gave each one.",
      "judged": {
       "rules": "the grader's verdict against that same truth",
       "judge": null,
@@ -266,8 +266,8 @@
        "key": "precision",
        "label": "precision of 'sufficient'",
        "definition": "When the grader said 'sufficient', how often a must-retrieve provision really was among the passages.",
-       "result": "0.94 (17 right of 18)",
-       "value": 0.94,
+       "result": "1.0 (17 right of 17)",
+       "value": 1.0,
        "target": null,
        "met": null,
        "detail": []
@@ -276,8 +276,8 @@
        "key": "recall_grader",
        "label": "recall of 'sufficient'",
        "definition": "When a must-retrieve provision was among the passages, how often the grader said 'sufficient'; a miss costs a rewrite, not a wrong answer.",
-       "result": "0.71 (17 of 24; 7 false fails cost a rewrite each)",
-       "value": 0.71,
+       "result": "0.81 (17 of 21; 4 false fails cost a rewrite each)",
+       "value": 0.81,
        "target": null,
        "met": null,
        "detail": []
@@ -794,11 +794,11 @@
    "of": 20
   },
   "nice_recall_loop": {
-   "found": 24,
+   "found": 21,
    "of": 39
   },
-  "attempts_mean": 1.45,
-  "rewrites_total": 9,
+  "attempts_mean": 1.35,
+  "rewrites_total": 7,
   "insufficient": [
    "Q-008"
   ],
@@ -811,80 +811,72 @@
    "Q-008: AI Act Art. 5",
    "Q-014: AI Act Art. 5"
   ],
-  "cost": 0.0088,
+  "cost": 0.0476,
   "grader": {
    "tp": 17,
-   "fp": 1,
-   "fn": 7,
-   "tn": 4,
-   "grades": 29,
-   "precision": 0.94,
-   "recall": 0.71,
+   "fp": 0,
+   "fn": 4,
+   "tn": 6,
+   "grades": 27,
+   "precision": 1.0,
+   "recall": 0.81,
    "confidence_min_median_max": [
-    0.88,
+    0.86,
     0.98,
     1.0
    ],
    "sweep": [
     {
      "threshold": 0.5,
-     "false_pass": 1,
-     "false_fail": 7,
-     "accepted": 18,
-     "of": 29
+     "false_pass": 0,
+     "false_fail": 4,
+     "accepted": 17,
+     "of": 27
     },
     {
      "threshold": 0.6,
-     "false_pass": 1,
-     "false_fail": 7,
-     "accepted": 18,
-     "of": 29
+     "false_pass": 0,
+     "false_fail": 4,
+     "accepted": 17,
+     "of": 27
     },
     {
      "threshold": 0.7,
-     "false_pass": 1,
-     "false_fail": 7,
-     "accepted": 18,
-     "of": 29
+     "false_pass": 0,
+     "false_fail": 4,
+     "accepted": 17,
+     "of": 27
     },
     {
      "threshold": 0.8,
-     "false_pass": 1,
-     "false_fail": 7,
-     "accepted": 18,
-     "of": 29
+     "false_pass": 0,
+     "false_fail": 4,
+     "accepted": 17,
+     "of": 27
     },
     {
      "threshold": 0.9,
-     "false_pass": 1,
-     "false_fail": 9,
+     "false_pass": 0,
+     "false_fail": 5,
      "accepted": 16,
-     "of": 29
+     "of": 27
     },
     {
      "threshold": 0.95,
-     "false_pass": 1,
-     "false_fail": 12,
-     "accepted": 13,
-     "of": 29
+     "false_pass": 0,
+     "false_fail": 7,
+     "accepted": 14,
+     "of": 27
     }
    ],
-   "false_pass": [
-    {
-     "id": "Q-014",
-     "confidence": 0.97
-    }
-   ],
+   "false_pass": [],
    "false_fail": [
-    "Q-002",
-    "Q-004",
+    "Q-005",
     "Q-008",
-    "Q-008",
-    "Q-009",
-    "Q-009",
+    "Q-013",
     "Q-013"
    ],
-   "grades_logged": 29
+   "grades_logged": 27
   },
   "gain": {
    "queries": 3,
@@ -903,7 +895,7 @@
     "domain": "D2",
     "domain_name": "Data sharing and transfers",
     "recovered": true,
-    "text": "found at the second search, after 1 rewrite"
+    "text": "found at the second search, after 1 rewrite; the grader never said enough"
    },
    {
     "id": "Q-006",
@@ -919,7 +911,7 @@
     "domain": "D4",
     "domain_name": "AI that is not high-risk",
     "recovered": true,
-    "text": "found at the second search, after 1 rewrite; the grader still said not enough and searched again"
+    "text": "found at the third search, after 2 rewrites; the grader never said enough"
    },
    {
     "id": "Q-014",
@@ -927,7 +919,7 @@
     "domain": "D6",
     "domain_name": "Special-category data",
     "recovered": false,
-    "text": "2 searches without it; the grader accepted the last set"
+    "text": "2 searches without it"
    }
   ]
  },
@@ -2636,8 +2628,8 @@
   {
    "set": "E3",
    "label": "E3 · E4",
-   "harness": 0.0088,
-   "gateway": 0.1,
+   "harness": 0.0476,
+   "gateway": 0.06,
    "cases": 20
   },
   {
@@ -2656,16 +2648,16 @@
   }
  ],
  "notes": {
-  "title": "Evaluation report · run of 27 October 2026",
+  "title": "Evaluation report · run of 27 October 2026, retrieval re-run 3 November",
   "headline": "The assistant finds the right law and never misses dangerously; where it falls short it puts the right finding one severity step too high or too low.",
   "summary": "Routing, screens and the output guardrail are clean. Retrieval meets its target and the agentic loop finds three queries a single search misses. Quick answers cite the right article in 13 of 15 and stay within three sentences. All 20 feature descriptions reached the DPO's pause with an assessment, the high-risk AI flag right every time and no dangerous miss. Where the assistant falls short, it is on the severity of findings it has otherwise got right.",
   "gateway_cost": {
    "E12": 0.02,
    "E7": 0.01,
-   "E3": 0.1,
+   "E3": 0.06,
    "E5": 0.07,
    "E6": 0.76,
-   "note": "OpenRouter activity page, 27 Oct; the harness prices tokens only, the reranker (about $0.002 a call, roughly 170 calls in E6) and the embeddings are the difference. A first E5 run on the shared retrieval set ($0.32) was superseded by the run on E5's own set."
+   "note": "OpenRouter activity page: 27 Oct for E1 E2 E7 E5 E6, 3 Nov for the E3 E4 re-run; the harness prices tokens only, the embeddings are the difference. A first E5 run on the shared retrieval set ($0.32) was superseded by the run on E5's own set; the E3 E4 run of 27 Oct ($0.10, with the Cohere reranker) by the re-run of 3 Nov."
   },
   "failure_modes": [
    {
@@ -2740,7 +2732,8 @@
   "limitations": [
    "One run per case, 20 cases, 15 questions: the numbers locate failure modes, they do not give confidence intervals; a second run would move the verdict count by one or two (A-003 varied 4 to 5 of 5 across four rehearsal runs).",
    "The test data was reviewed by an AI model acting as the domain expert (two rounds); the human expert's review is pending, and the DPIA (A-007, A-009) and Art. 9 severity (A-012, A-017) expectations are the ones most likely to move.",
-   "The reviser (E9) and the memory's effect on later assessments are not measured here; pytest and the demo cover the mechanics. The model-dependence run on Mistral Large 4 was not made."
+   "The reviser (E9) and the memory's effect on later assessments are not measured here; pytest and the demo cover the mechanics. The model-dependence run on Mistral Large 4 was not made.",
+   "Retrieval (E3, E4) was re-run on 3 November after the reranker changed from Cohere's Rerank 4 Fast to a listwise rerank by the cheap model (the gateway's reranker has no zero-data-retention endpoint, which the deployment's data policy requires): recall with the loop stayed at 19 of 20 and a single search at 16 of 20, with the same misses; the grader's calls improved (precision 1.0, recall 0.81 over 27 grades). The quick answers and full assessments (E5, E6) still carry the numbers of 27 October, measured with the Cohere ranking underneath; a second E3 run the same morning found 20 of 20 with the loop, which is the one-run-per-case caveat in numbers."
   ],
   "next": [
    "Nothing in the app was changed in response to these numbers, by the rule set before the run.",

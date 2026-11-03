@@ -99,6 +99,10 @@ slots:
     name: Rerank 4 Fast
     endpoint: /rerank                        # relative to base_url; falls back to LLM listwise rerank on error
     top_n: 5
+    # method: api | llm. llm since 3 Nov: the gateway's reranker has no zero-data-retention endpoint, so the account's
+    # data policy refuses it (scripts/probe_provider.py); the cheap model ranks the passages instead (listwise, structured
+    # output). Set api to use Rerank 4 Fast again; the evaluation of 27 Oct was measured with api.
+    method: llm
 
   # Router behind the `route` node. implementation: jev | llm
   router:

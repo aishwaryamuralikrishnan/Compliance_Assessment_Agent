@@ -1,14 +1,14 @@
 {
-  "title": "Evaluation report · run of 27 October 2026",
+  "title": "Evaluation report · run of 27 October 2026, retrieval re-run 3 November",
   "headline": "The assistant finds the right law and never misses dangerously; where it falls short it puts the right finding one severity step too high or too low.",
   "summary": "Routing, screens and the output guardrail are clean. Retrieval meets its target and the agentic loop finds three queries a single search misses. Quick answers cite the right article in 13 of 15 and stay within three sentences. All 20 feature descriptions reached the DPO's pause with an assessment, the high-risk AI flag right every time and no dangerous miss. Where the assistant falls short, it is on the severity of findings it has otherwise got right.",
   "gateway_cost": {
     "E12": 0.02,
     "E7": 0.01,
-    "E3": 0.1,
+    "E3": 0.06,
     "E5": 0.07,
     "E6": 0.76,
-    "note": "OpenRouter activity page, 27 Oct; the harness prices tokens only, the reranker (about $0.002 a call, roughly 170 calls in E6) and the embeddings are the difference. A first E5 run on the shared retrieval set ($0.32) was superseded by the run on E5's own set."
+    "note": "OpenRouter activity page: 27 Oct for E1 E2 E7 E5 E6, 3 Nov for the E3 E4 re-run; the harness prices tokens only, the embeddings are the difference. A first E5 run on the shared retrieval set ($0.32) was superseded by the run on E5's own set; the E3 E4 run of 27 Oct ($0.10, with the Cohere reranker) by the re-run of 3 Nov."
   },
   "failure_modes": [
     {
@@ -83,7 +83,8 @@
   "limitations": [
     "One run per case, 20 cases, 15 questions: the numbers locate failure modes, they do not give confidence intervals; a second run would move the verdict count by one or two (A-003 varied 4 to 5 of 5 across four rehearsal runs).",
     "The test data was reviewed by an AI model acting as the domain expert (two rounds); the human expert's review is pending, and the DPIA (A-007, A-009) and Art. 9 severity (A-012, A-017) expectations are the ones most likely to move.",
-    "The reviser (E9) and the memory's effect on later assessments are not measured here; pytest and the demo cover the mechanics. The model-dependence run on Mistral Large 4 was not made."
+    "The reviser (E9) and the memory's effect on later assessments are not measured here; pytest and the demo cover the mechanics. The model-dependence run on Mistral Large 4 was not made.",
+    "Retrieval (E3, E4) was re-run on 3 November after the reranker changed from Cohere's Rerank 4 Fast to a listwise rerank by the cheap model (the gateway's reranker has no zero-data-retention endpoint, which the deployment's data policy requires): recall with the loop stayed at 19 of 20 and a single search at 16 of 20, with the same misses; the grader's calls improved (precision 1.0, recall 0.81 over 27 grades). The quick answers and full assessments (E5, E6) still carry the numbers of 27 October, measured with the Cohere ranking underneath; a second E3 run the same morning found 20 of 20 with the loop, which is the one-run-per-case caveat in numbers."
   ],
   "next": [
     "Nothing in the app was changed in response to these numbers, by the rule set before the run.",
