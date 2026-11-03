@@ -83,6 +83,7 @@ export default function AssistantPage() {
         <div>
           <h2 style={{ fontSize: 22, fontWeight: 700 }}>Describe the feature or ask a question</h2>
           <p className="muted" style={{ margin: "4px 0 0 0" }}>A full assessment goes to the DPO automatically; only her approval writes the register. One request per conversation.</p>
+          <p className="small notice-line">AI system · an automated first pass, not legal advice · your text is redacted and sent to AI model providers through OpenRouter under zero data retention · enter no real personal data · <a href="/privacy" target="_blank" rel="noreferrer">privacy notice</a></p>
         </div>
         <section className="card pad" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <textarea value={text} onChange={(e) => setText(e.target.value)} rows={5} disabled={busy} autoFocus

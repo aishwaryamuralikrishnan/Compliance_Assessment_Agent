@@ -104,7 +104,7 @@ Setting of 23 Oct 2026 (development; the showcase lines for Mistral Large 4 are 
 ## Tests
 
 ```powershell
-pytest tests -q                                                  # 75 tests, about 2 min (bcrypt and the Postgres round trips)
+pytest tests -q                                                  # 78 tests, about 2 min (bcrypt and the Postgres round trips)
 pytest tests -q --cov=compliance_agent --cov=api --cov-report=term-missing    # with line coverage (pytest-cov, requirements-eval.txt)
 ```
 
@@ -137,6 +137,8 @@ python scripts/admin.py prune-threads --days 30  # checkpoint retention: remove 
 Restart the API after a `reset` (the run registry and the compiled graph live in the process).
 
 **Checkpoint retention.** The checkpointer saves the whole graph state after every node of every thread (that is what makes interrupt and resume work), so it grows without bound. `prune-threads` deletes the checkpoints of threads that are *finished* and older than the cut-off, and nothing else: assessments, review tasks, the register and long-term memory are records and stay. A thread is kept whatever its age while anything is open on it: paused at an interrupt (waiting for the DPO or for the product manager), nodes still scheduled (a run that stopped half-way), a pending review task, or a latest assessment waiting for changes; a thread whose state cannot be read is kept and reported rather than deleted on a guess. A pruned thread's conversation page is gone, its register entry and decision history are not. Run it from a scheduled task once the app is hosted (`compliance_agent/retention.py` is the module behind the command).
+
+**A person's deletion request.** `python scripts/admin.py forget <username or e-mail>` carries out an erasure request from the privacy notice: it deletes the account, the person's conversations with their saved state, the assessments and review requests they made and their own memory namespace; register entries and memory items that are the organisation's record stay, with the person's name replaced by `deleted user` (a record kept under a duty is pseudonymised, not destroyed). Against the hosted database: set `DATABASE_URL` to its connection string for that one command, as for `reset`.
 
 ## Stop
 

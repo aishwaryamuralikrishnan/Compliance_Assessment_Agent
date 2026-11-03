@@ -481,3 +481,10 @@ details.appendix > summary { font-size: 13px; color: var(--ink); }
 .fm .resp .wdk { color: var(--ok-ink); margin-right: 6px; }
 .fm .resp.fix { background: var(--dpia-bg); }
 .fm .resp.fix .wdk { color: var(--dpia-ink); }
+
+/* notices (3 Nov, to-do item 27): the line under the assistant's heading and the privacy page */
+.notice-line { margin: 8px 0 0 0; color: var(--muted); }
+.notice-line a { color: var(--accent-ink); }
+.notice h3 { font-size: 15px; margin: 0 0 8px 0; }
+.notice p { margin: 0 0 10px 0; max-width: 90ch; line-height: 1.6; }
+.notice p:last-child { margin-bottom: 0; }

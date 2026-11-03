@@ -7,6 +7,9 @@
     python scripts/admin.py memory --dedupe                # per namespace: keep the first of items with the same text / note
     python scripts/admin.py memory --delete <key> [<key> ...]
     python scripts/admin.py memory --clear-learned         # remove every learned item, keep the seeded ones
+    python scripts/admin.py forget pat@example.com         # a person's deletion request: their account, conversations and saved
+                                                           # state, assessments, review tasks and own memory go; register entries
+                                                           # and memory items they authored stay with the name replaced by 'deleted user'
     python scripts/admin.py reset                          # fresh demo state: assessments, review tasks, register, threads,
                                                            # learned memory all gone; corpus, users and seeded memory stay
     python scripts/admin.py prune-threads --days 30        # remove the saved state (checkpoints) of finished conversations
@@ -137,6 +140,70 @@ def cmd_memory(args: argparse.Namespace) -> None:
 
 
 # --------------------------------------------------------------------------------------
+# forget a user (erasure request, privacy notice "Your rights and whom to ask")
+# --------------------------------------------------------------------------------------
+
+DELETED = "deleted user"
+
+
+def cmd_forget(args: argparse.Namespace) -> None:
+    """Carry out a deletion request: the account, the person's conversations and their saved state, the assessments and
+    review tasks they requested, their own memory namespace; register entries and memory items that are the
+    organisation's record stay, with the person's name replaced by 'deleted user' (GDPR Art. 17(3)(b): records kept
+    under a legal duty are pseudonymised, not destroyed)."""
+    from langgraph.store.postgres import PostgresStore
+
+    who = args.user.strip().lower()
+    with db.connection() as conn:
+        row = conn.execute("SELECT username, display_name, role, email FROM users WHERE lower(username) = %s OR lower(email) = %s", (who, who)).fetchone()
+        if not row:
+            sys.exit(f"no user with username or e-mail '{args.user}'")
+        u = row["username"]
+        threads = [r["thread_id"] for r in conn.execute("SELECT DISTINCT thread_id FROM assessments WHERE created_by = %s", (u,)).fetchall()]
+        threads += [r["thread_id"] for r in conn.execute("SELECT DISTINCT thread_id FROM review_tasks WHERE requested_by = %s", (u,)).fetchall() if r["thread_id"] not in threads]
+        n_reg = conn.execute("SELECT count(*) AS n FROM register WHERE requested_by = %s OR approved_by = %s", (u, u)).fetchone()["n"]
+    print(f"user {u} ({row['display_name']}, {row['role']}, e-mail {row['email'] or '-'})")
+    print(f"  delete: the account, {len(threads)} conversation(s) with their saved state, their assessments and review tasks, their memory namespace")
+    print(f"  keep, pseudonymised: {n_reg} register entr{'y' if n_reg == 1 else 'ies'} and memory items that name the person as author")
+    if not confirm("carry out the deletion?", args.yes):
+        print("nothing changed")
+        return
+    with db.connection() as conn:
+        n = {}
+        if threads:
+            for table in ("checkpoint_writes", "checkpoint_blobs", "checkpoints"):
+                try:
+                    n[table] = conn.execute(f"DELETE FROM {table} WHERE thread_id = ANY(%s)", (threads,)).rowcount
+                except Exception:
+                    n[table] = "n/a"
+            n["review_tasks"] = conn.execute("DELETE FROM review_tasks WHERE thread_id = ANY(%s)", (threads,)).rowcount
+            n["assessments"] = conn.execute("DELETE FROM assessments WHERE thread_id = ANY(%s)", (threads,)).rowcount
+        n["register (pseudonymised)"] = conn.execute("UPDATE register SET requested_by = CASE WHEN requested_by = %s THEN %s ELSE requested_by END, "
+                                                     "approved_by = CASE WHEN approved_by = %s THEN %s ELSE approved_by END WHERE requested_by = %s OR approved_by = %s",
+                                                     (u, DELETED, u, DELETED, u, u)).rowcount
+        n["review_tasks resolved_by (pseudonymised)"] = conn.execute("UPDATE review_tasks SET resolved_by = %s WHERE resolved_by = %s", (DELETED, u)).rowcount
+        n["users"] = conn.execute("DELETE FROM users WHERE username = %s", (u,)).rowcount
+    with PostgresStore.from_conn_string(config.database_url(), index=db.store_index_config()) as store:
+        ns = memory.user_prefs_namespace(u)
+        own = memory.list_namespace(store, ns, limit=500)
+        for it in own:
+            store.delete(ns, it["key"])
+        n["memory (own namespace)"] = len(own)
+        renamed = 0
+        for _, org_ns in NAMESPACES:
+            for it in memory.list_namespace(store, org_ns, limit=500):
+                if it.get("author") == u or it.get("user") == u:
+                    value = {k: v for k, v in it.items() if k != "key"}
+                    value["author"] = DELETED if value.get("author") == u else value.get("author")
+                    if value.get("user") == u:
+                        value["user"] = DELETED
+                    store.put(org_ns, it["key"], value)
+                    renamed += 1
+        n["memory (author pseudonymised)"] = renamed
+    print("done:", ", ".join(f"{k}={v}" for k, v in n.items()))
+
+
+# --------------------------------------------------------------------------------------
 # reset
 # --------------------------------------------------------------------------------------
 
@@ -198,6 +265,9 @@ def main(argv: list[str] | None = None) -> None:
     m.add_argument("--delete", nargs="+", metavar="KEY", help="delete items by key")
     m.add_argument("--clear-learned", action="store_true", help="remove every learned item, keep the seeded ones")
     m.set_defaults(func=cmd_memory)
+    f = sub.add_parser("forget", help="carry out a person's deletion request: account, conversations, own memory; records pseudonymised")
+    f.add_argument("user", help="username or e-mail address")
+    f.set_defaults(func=cmd_forget)
     x = sub.add_parser("reset", help="fresh demo state (keeps corpus, users, seeded memory)")
     x.set_defaults(func=cmd_reset)
     t = sub.add_parser("prune-threads", help="remove the checkpoints of finished conversations older than N days")

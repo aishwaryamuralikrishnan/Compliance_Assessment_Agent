@@ -55,7 +55,10 @@ export default function LoginPage() {
             <div className="stat"><b>DPO</b><span>approval before anything is recorded</span></div>
           </div>
         </div>
-        <div className="small" style={{ color: "var(--rail-text)" }}>Turing College capstone · Aishwarya Muralikrishnan · <a href="/evaluation" style={{ color: "#DCE8FA" }}>How well does it work? The evaluation report</a></div>
+        <div className="small" style={{ color: "var(--rail-text)", display: "flex", flexDirection: "column", gap: 6 }}>
+          <span>This is an AI system in a demo: what you type is redacted and then sent to AI model providers through OpenRouter under zero data retention. Please enter no real personal data. <a href="/privacy" style={{ color: "#DCE8FA" }}>Privacy notice</a></span>
+          <span>Turing College capstone · Aishwarya Muralikrishnan · <a href="/evaluation" style={{ color: "#DCE8FA" }}>How well does it work? The evaluation report</a></span>
+        </div>
       </section>
       <div className="formside">
         <form onSubmit={submit}>
