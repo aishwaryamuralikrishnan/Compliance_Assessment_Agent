@@ -1,9 +1,9 @@
 Compliance Assistant · important links
 =======================================
-Kept by hand. Update the Vercel line once the website is deployed (step 5 of the Vercel steps).
+Kept by hand. Deployed on Vercel on 3 November 2026 from the public repository (root directory: site/).
 
 WEBSITE (portfolio page, static, Vercel)
-  Website ................... https://<fill in after deploy>.vercel.app
+  Website ................... https://complianceassessmentagent-site.vercel.app
   Source of the page ........ site/index.html in the public repository (images in site/images/)
   Design canvas (Claude) .... https://claude.ai/artifact/EBdrFG1BwQFc8GV3858Nzo   (private until shared from its Share menu)
 

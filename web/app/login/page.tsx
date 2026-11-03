@@ -2,9 +2,21 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { api } from "@/lib/api";
+import { api, ApiError } from "@/lib/api";
 import { landing } from "@/lib/nav";
 import type { User } from "@/lib/types";
+
+// The hosted demo runs on a free tier that sleeps: the first request after a pause can take up to a minute and the
+// proxy answers 502/503/504 meanwhile. The provider check retries until the API answers, and a sign-in that hits
+// the wake-up says so instead of "Bad Gateway".
+const WAKE_RETRIES = 12;
+const WAKE_DELAY_MS = 5000;
+const WAKE_MESSAGE = "The server is waking up (free hosting); please try again in a few seconds.";
+
+function isWakingUp(err: unknown): boolean {
+  // 500 included: the front end's proxy answers 500 when the API refuses the connection while it starts
+  return (err instanceof ApiError && [500, 502, 503, 504].includes(err.status)) || (err instanceof TypeError);
+}
 
 const OIDC_ERRORS: Record<string, string> = {
   "state-expired": "The sign-in took too long or the browser lost its place; please try again.",
@@ -23,10 +35,26 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [provider, setProvider] = useState<{ oidc: boolean; name: string | null } | null>(null);
+  const [waking, setWaking] = useState(false);
   useEffect(() => {
-    api.get<{ oidc: boolean; name: string | null }>("/api/auth/providers").then(setProvider).catch(() => setProvider({ oidc: false, name: null }));
+    let cancelled = false;
+    (async () => {
+      for (let attempt = 1; attempt <= WAKE_RETRIES && !cancelled; attempt++) {
+        try {
+          const p = await api.get<{ oidc: boolean; name: string | null }>("/api/auth/providers");
+          if (!cancelled) { setProvider(p); setWaking(false); }
+          return;
+        } catch (err) {
+          if (!isWakingUp(err)) break;                 // a real answer (for example 404: not configured), not a sleeping server
+          if (!cancelled) setWaking(true);
+          await new Promise((r) => setTimeout(r, WAKE_DELAY_MS));
+        }
+      }
+      if (!cancelled) { setProvider({ oidc: false, name: null }); setWaking(false); }
+    })();
     const e = new URLSearchParams(window.location.search).get("error");   // the OIDC callback redirects here on failure
     if (e) setError(OIDC_ERRORS[e] || `Sign-in with the identity provider failed (${e}).`);
+    return () => { cancelled = true; };
   }, []);
 
   async function submit(e: FormEvent) {
@@ -37,7 +65,7 @@ export default function LoginPage() {
       const u = await api.post<User>("/api/auth/login", { username, password });
       router.replace(landing(u));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed.");
+      setError(isWakingUp(err) ? WAKE_MESSAGE : err instanceof Error ? err.message : "Login failed.");
       setBusy(false);
     }
   }
@@ -70,6 +98,7 @@ export default function LoginPage() {
             <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" />
           </label>
           {error ? <div className="error">{error}</div> : null}
+          {waking ? <div className="small muted" role="status">Waking the server up (free hosting), one moment…</div> : null}
           <button className="btn primary" type="submit" disabled={busy || !username || !password} style={{ height: 44, justifyContent: "center", marginTop: 4 }}>Sign in</button>
           {provider?.oidc ? (
             <>
