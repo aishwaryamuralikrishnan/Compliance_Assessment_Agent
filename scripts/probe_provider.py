@@ -51,13 +51,16 @@ def _post(path: str, body: dict) -> tuple[int, str]:
 
 def probe_rerank(routing: dict) -> None:
     spec = models.slot_spec("reranker")
+    if spec.get("method", "api") != "api":
+        print(f"\nrerank  {spec['model']}: not used; reranker.method is '{spec['method']}' in config/models.yaml, the cheap slot ranks the passages\n"
+              "  (the gateway's reranker has no zero-data-retention endpoint; the probe below shows the gateway's answer for the record)")
     body = {"model": spec["model"], "query": "data protection impact assessment", "documents": ["Article 35 DPIA", "Article 6 lawful basis"], "top_n": 1}
     path = spec.get("endpoint", "/rerank")
     plain = _post(path, body)
     with_policy = _post(path, {**body, "provider": routing})
     print(f"\nrerank  {spec['model']}\n  without provider block: {plain[0]}\n  with provider block:    {with_policy[0]}  {with_policy[1] if with_policy[0] != 200 else ''}")
     _verdict(plain[0], with_policy[0])
-    if "zdr" in routing and with_policy[0] != 200:
+    if "zdr" in routing and with_policy[0] != 200 and plain[0] == 200:
         without_zdr = {k: v for k, v in routing.items() if k != "zdr"}
         r = _post(path, {**body, "provider": without_zdr})
         print(f"  with the block minus zdr ({json.dumps(without_zdr)}): {r[0]}  {r[1] if r[0] != 200 else ''}")
@@ -81,6 +84,8 @@ def _verdict(plain: int, with_policy: int) -> None:
         print("  -> the endpoint understood the block but no provider of this model meets the policy (the model has no endpoint with that data policy).")
     elif plain == 200 and with_policy >= 400:
         print("  -> the endpoint rejects the block itself: the policy cannot be sent here; record it as a known gap and rely on the account settings.")
+    elif plain == 404:
+        print("  -> the account's data policy refuses every endpoint of this model (no zero-data-retention endpoint): the app must not depend on it.")
     else:
         print("  -> the call itself fails; check the key, the base URL and the model id first.")
 
