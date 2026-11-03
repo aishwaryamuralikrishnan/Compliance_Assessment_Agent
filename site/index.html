@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Compliance Assistant · GDPR and EU AI Act assessments with a human in the loop</title>
+<meta name="description" content="An AI agent that drafts a first GDPR and EU AI Act assessment of a product feature, with article citations checked against the law and a Data Protection Officer deciding what goes on record. Turing College capstone by Aishwarya Murali Krishnan.">
+<meta property="og:title" content="Compliance Assistant">
+<meta property="og:description" content="Know whether a product feature meets the GDPR and the EU AI Act before building it.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Space+Grotesk:wght@500;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F4F6FA}
+a{color:#2457D6}a:hover{color:#163A99}
+@keyframes fall{0%{transform:translateY(0);opacity:0}12%{opacity:0.5}88%{opacity:0.5}100%{transform:translateY(150px);opacity:0}}
+@keyframes scan{0%{left:-30%}100%{left:110%}}
+.tag{position:absolute;font-family:'JetBrains Mono',monospace;font-size:13px;color:#9DB8F0;opacity:0;animation:fall 18s linear infinite;white-space:nowrap;pointer-events:none}
+.scan{position:absolute;top:0;bottom:0;width:30%;background:linear-gradient(90deg,rgba(79,139,255,0) 0%,rgba(79,139,255,0.10) 50%,rgba(79,139,255,0) 100%);animation:scan 11s linear infinite;pointer-events:none}
+html{scroll-behavior:smooth}
+img{max-width:100%}
+@media (max-width: 720px){
+  h1{font-size:36px !important}
+  .hero-pictures{grid-template-columns:1fr !important}
+  .hero-pictures figure{margin:0 !important}
+  .who article{border-right:none !important;border-bottom:1px solid #E1E6F0}
+  .who article:last-child{border-bottom:none}
+  .eval > div{border-right:none !important;padding-left:0 !important;padding-right:0 !important;border-bottom:1px solid #C5CFDF}
+  .eval > div:last-child{border-bottom:none}
+}
+@media (prefers-reduced-motion: reduce){.tag,.scan{animation:none !important}}
+</style>
+</head>
+<body>
+<div style="min-height: 100vh; color: #14213D; font-family: Inter, system-ui, sans-serif; font-size: 16px; line-height: 1.55; background-color: #F4F6FA; background-image: radial-gradient(circle at 12% 30%, rgba(36, 87, 214, 0.12), rgba(36, 87, 214, 0) 40%), radial-gradient(circle at 88% 70%, rgba(15, 42, 90, 0.12), rgba(15, 42, 90, 0) 40%)">
+
+  <section id="top" aria-label="Introduction" style="position: relative; overflow: hidden; background: #0B1A3A; color: #FFFFFF; padding: 0 0 140px 0">
+    <div class="scan" aria-hidden="true"></div>
+    <span class="tag" aria-hidden="true" style="left: 4%; top: 6%; animation-delay: 0s">GDPR Art. 22(1)</span>
+    <span class="tag" aria-hidden="true" style="left: 16%; top: 2%; animation-delay: 4s">AI Act Annex III · point 5</span>
+    <span class="tag" aria-hidden="true" style="left: 29%; top: 8%; animation-delay: 8s">GDPR Art. 35(3)(a)</span>
+    <span class="tag" aria-hidden="true" style="left: 42%; top: 3%; animation-delay: 12s">GDPR Rec. 71</span>
+    <span class="tag" aria-hidden="true" style="left: 55%; top: 7%; animation-delay: 2s">GDPR Art. 45</span>
+    <span class="tag" aria-hidden="true" style="left: 67%; top: 2%; animation-delay: 6s">AI Act Art. 5</span>
+    <span class="tag" aria-hidden="true" style="left: 80%; top: 9%; animation-delay: 10s">GDPR Art. 6(4)</span>
+    <span class="tag" aria-hidden="true" style="left: 91%; top: 4%; animation-delay: 14s">AI Act Art. 9</span>
+    <header style="position: relative">
+      <nav aria-label="Primary" style="max-width: 1120px; margin: 0 auto; padding: 0 24px; min-height: 64px; display: flex; align-items: center; gap: 24px; flex-wrap: wrap; font-size: 15px">
+        <a href="#top" style="display: flex; align-items: center; gap: 10px; color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 16px; min-height: 44px">
+          <span style="width: 32px; height: 32px; border-radius: 9px; background: #4F8BFF; color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center; font-weight: 800" aria-hidden="true">C</span>
+          Compliance Assistant
+        </a>
+        <span style="flex: 1"></span>
+        <a href="#highlights" style="color: #C9D6F2; text-decoration: none; font-weight: 500; padding: 10px 4px">Highlights</a>
+        <a href="#evaluation" style="color: #C9D6F2; text-decoration: none; font-weight: 500; padding: 10px 4px">Evaluation</a>
+        <a href="#trust" style="color: #C9D6F2; text-decoration: none; font-weight: 500; padding: 10px 4px">Compliance</a>
+        <a href="https://github.com/aishwaryamuralikrishnan/Compliance_Assessment_Agent" target="_blank" rel="noreferrer" style="color: #C9D6F2; text-decoration: none; font-weight: 500; padding: 10px 4px">GitHub</a>
+        <a href="https://compliance-web-qo1l.onrender.com/login" target="_blank" rel="noreferrer" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 10px; background: #4F8BFF; color: #FFFFFF; text-decoration: none; font-weight: 600">Try the demo</a>
+      </nav>
+    </header>
+    <div style="position: relative; max-width: 1120px; margin: 0 auto; padding: 64px 24px 0 24px; display: flex; flex-wrap: wrap; gap: 32px 24px; align-items: flex-start">
+      <div style="flex: 1 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 22px">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: #9DB8F0; font-weight: 600">GDPR · EU AI Act</div>
+        <h1 style="margin: 0; font-size: 50px; line-height: 1.08; font-weight: 800; letter-spacing: -0.02em">Know whether a product feature meets the GDPR and the EU AI Act before building it.</h1>
+        <p style="margin: 0; font-size: 18px; line-height: 1.55; color: #C9D6F2">An AI agent for a first compliance assessment. Describe a product feature and it drafts an assessment against the GDPR and the EU AI Act.</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center">
+          <a href="https://compliance-web-qo1l.onrender.com/login" target="_blank" rel="noreferrer" style="display: inline-flex; align-items: center; min-height: 48px; padding: 0 22px; border-radius: 10px; background: #4F8BFF; color: #FFFFFF; text-decoration: none; font-weight: 600; font-size: 16px">Try the live demo · sign in with Google</a>
+          <a href="https://github.com/aishwaryamuralikrishnan/Compliance_Assessment_Agent" target="_blank" rel="noreferrer" style="display: inline-flex; align-items: center; min-height: 48px; padding: 0 22px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.45); color: #FFFFFF; text-decoration: none; font-weight: 600; font-size: 16px">Source on GitHub</a>
+        </div>
+        <p style="margin: 0; font-size: 13px; color: #9DB8F0">A demonstration, not legal advice. The hosted demo runs on free tiers and may take a minute to wake up. Please enter no real personal data; see the <a href="https://compliance-web-qo1l.onrender.com/privacy" target="_blank" rel="noreferrer" style="color: #FFFFFF">privacy notice</a>.</p>
+      </div>
+      <div class="hero-pictures" style="flex: 1 1 560px; min-width: 0; display: grid; grid-template-columns: minmax(0, 9fr) minmax(0, 11fr); align-items: start">
+        <figure style="margin: 0; display: flex; flex-direction: column; gap: 10px">
+          <div style="border-radius: 14px; background: #1C2433; box-shadow: 0 1px 0 rgba(255,255,255,0.18) inset, 0 30px 70px rgba(0,0,0,0.55), 0 8px 20px rgba(0,0,0,0.35); overflow: hidden">
+            <div style="height: 30px; display: flex; align-items: center; gap: 8px; padding: 0 12px; background: #141B29; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #9DB8F0" aria-hidden="true"><span style="width: 10px; height: 10px; border-radius: 50%; background: #3C4454"></span><span style="width: 10px; height: 10px; border-radius: 50%; background: #3C4454"></span><span style="width: 10px; height: 10px; border-radius: 50%; background: #3C4454"></span><span style="margin-left: 8px">Assistant · assessment A-1389</span></div>
+            <img src="images/assessment_card.png" alt="An assessment card: the verdict Do not build as described for automated credit scoring, three findings marked Blocker, Required and Covered with their GDPR citations, next steps and the five verified sources" style="display: block; width: 100%; height: auto">
+          </div>
+          <figcaption style="font-size: 13px; color: #9DB8F0; padding-right: 32px">A full assessment as the product manager sees it: the verdict, the findings (Blocker, Required, Covered) with citations verified against the law's text, the next steps and the sources.</figcaption>
+        </figure>
+        <figure style="margin: 96px 0 0 -16px; position: relative; display: flex; flex-direction: column; gap: 10px">
+          <div style="border-radius: 14px; background: #1C2433; box-shadow: 0 1px 0 rgba(255,255,255,0.18) inset, 0 40px 80px rgba(0,0,0,0.6), 0 10px 24px rgba(0,0,0,0.4); overflow: hidden">
+            <div style="height: 30px; display: flex; align-items: center; gap: 8px; padding: 0 12px; background: #141B29; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #9DB8F0" aria-hidden="true"><span style="width: 10px; height: 10px; border-radius: 50%; background: #3C4454"></span><span style="width: 10px; height: 10px; border-radius: 50%; background: #3C4454"></span><span style="width: 10px; height: 10px; border-radius: 50%; background: #3C4454"></span><span style="margin-left: 8px">Behind the scenes · Graph</span></div>
+            <img src="images/live_graph.gif" alt="The Behind the scenes panel during a run: the orchestrator graph lights up node by node, from validate_input through route and the worker to the output guardrail, then pauses at the DPO's interrupt" style="display: block; width: 100%; height: auto">
+          </div>
+          <figcaption style="font-size: 13px; color: #9DB8F0">Behind the scenes, live: the orchestrator's graph lights up as the run moves through it, until it pauses for the DPO.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="who" aria-label="Who it is for" style="max-width: 1120px; margin: -80px auto 0 auto; padding: 0 24px; position: relative">
+    <div class="who" style="background: #FFFFFF; border-radius: 16px; box-shadow: 0 20px 50px rgba(11, 26, 58, 0.22); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr))">
+      <article style="padding: 28px 32px; display: flex; flex-direction: column; gap: 8px; border-right: 1px solid #E1E6F0">
+        <div style="font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600; color: #4F6B9A">For product teams</div>
+        <h3 style="margin: 0; font-size: 20px; font-weight: 700">Ask before building</h3>
+        <p style="margin: 0; color: #3B4661; font-size: 15px">A product manager describes the planned feature in plain language and gets the verdict, what blocks the build, what is required before the build and what is already covered, with next steps.</p>
+      </article>
+      <article style="padding: 28px 32px; display: flex; flex-direction: column; gap: 8px">
+        <div style="font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600; color: #4F6B9A">For the Data Protection Officer</div>
+        <h3 style="margin: 0; font-size: 20px; font-weight: 700">Decide and keep the record</h3>
+        <p style="margin: 0; color: #3B4661; font-size: 15px">The DPO reviews each draft in a queue: amend, approve, request changes to the feature, or reject.</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="what" aria-label="What it does" style="max-width: 1120px; margin: 0 auto; padding: 56px 24px 0 24px; display: flex; flex-direction: column; gap: 24px">
+    <h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 30px; font-weight: 700; color: #0F2A5A">What it does</h2>
+    <article style="background: #FFFFFF; border-radius: 14px; border-bottom: 5px solid #C9D3E3; box-shadow: 0 1px 0 #FFFFFF inset, 0 24px 48px rgba(15, 42, 90, 0.16), 0 4px 10px rgba(15, 42, 90, 0.08); padding: 28px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(360px, 100%), 1fr)); gap: 32px; align-items: start">
+      <div style="position: relative">
+        <div style="border-radius: 10px; overflow: hidden; border: 1px solid #D9DEE8">
+          <img src="images/assessment_card.png" alt="An assessment card: the verdict Do not build as described for automated credit scoring, three findings marked Blocker, Required and Covered with their GDPR citations, next steps and the five verified sources" style="display: block; width: 100%; height: auto">
+        </div>
+        <span style="position: absolute; left: 45%; top: 11.5%; transform: translate(-50%, -50%); width: 30px; height: 30px; border-radius: 50%; background: #0F2A5A; color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 700; font-size: 14px; box-shadow: 0 0 0 4px #FFFFFF, 0 6px 14px rgba(15, 42, 90, 0.35)" aria-hidden="true">1</span>
+        <span style="position: absolute; left: 3%; top: 45%; transform: translate(-50%, -50%); width: 30px; height: 30px; border-radius: 50%; background: #0F2A5A; color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 700; font-size: 14px; box-shadow: 0 0 0 4px #FFFFFF, 0 6px 14px rgba(15, 42, 90, 0.35)" aria-hidden="true">2</span>
+        <span style="position: absolute; left: 56%; top: 6%; transform: translate(-50%, -50%); width: 30px; height: 30px; border-radius: 50%; background: #0F2A5A; color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 700; font-size: 14px; box-shadow: 0 0 0 4px #FFFFFF, 0 6px 14px rgba(15, 42, 90, 0.35)" aria-hidden="true">3</span>
+        <span style="position: absolute; left: 81%; top: 37%; transform: translate(-50%, -50%); width: 30px; height: 30px; border-radius: 50%; background: #0F2A5A; color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 700; font-size: 14px; box-shadow: 0 0 0 4px #FFFFFF, 0 6px 14px rgba(15, 42, 90, 0.35)" aria-hidden="true">4</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 14px">
+        <span style="width: 40px; height: 40px; border-radius: 10px; background: #0F2A5A; display: inline-flex; align-items: center; justify-content: center" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l3 3v13H5z"/><path d="M8 11h8M8 15h8"/></svg></span>
+        <h3 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 22px; font-weight: 700; color: #0F2A5A">Full assessment</h3>
+        <p style="margin: 0; color: #3B4661; font-size: 15px">Describe a feature; get a structured draft.</p>
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <div style="display: flex; gap: 12px; align-items: flex-start; background: #F1F4F9; border-radius: 10px; padding: 12px 14px"><span style="flex: 0 0 26px; width: 26px; height: 26px; border-radius: 50%; background: #0F2A5A; color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 700; font-size: 13px" aria-hidden="true">1</span><span style="display: flex; flex-direction: column; gap: 2px"><b style="font-size: 14px">Verdict</b><span style="font-size: 13px; color: #3B4661">Proceed · with conditions · Do not build</span></span></div>
+          <div style="display: flex; gap: 12px; align-items: flex-start; background: #F1F4F9; border-radius: 10px; padding: 12px 14px"><span style="flex: 0 0 26px; width: 26px; height: 26px; border-radius: 50%; background: #0F2A5A; color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 700; font-size: 13px" aria-hidden="true">2</span><span style="display: flex; flex-direction: column; gap: 2px"><b style="font-size: 14px">Findings with severity</b><span style="font-size: 13px; color: #3B4661">Blocker · Required · Covered</span></span></div>
+          <div style="display: flex; gap: 12px; align-items: flex-start; background: #F1F4F9; border-radius: 10px; padding: 12px 14px"><span style="flex: 0 0 26px; width: 26px; height: 26px; border-radius: 50%; background: #0F2A5A; color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 700; font-size: 13px" aria-hidden="true">3</span><span style="display: flex; flex-direction: column; gap: 2px"><b style="font-size: 14px">Flags</b><span style="font-size: 13px; color: #3B4661">high-risk AI · DPIA required</span></span></div>
+          <div style="display: flex; gap: 12px; align-items: flex-start; background: #F1F4F9; border-radius: 10px; padding: 12px 14px"><span style="flex: 0 0 26px; width: 26px; height: 26px; border-radius: 50%; background: #0F2A5A; color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 700; font-size: 13px" aria-hidden="true">4</span><span style="display: flex; flex-direction: column; gap: 2px"><b style="font-size: 14px">Citations</b><span style="font-size: 13px; color: #3B4661">each one checked against the law's text</span></span></div>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section id="highlights" aria-label="Highlights" style="max-width: 1120px; margin: 0 auto; padding: 56px 24px 0 24px; display: flex; flex-direction: column; gap: 28px">
+    <h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 30px; font-weight: 700; color: #0F2A5A">Highlights</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 24px">
+      <article style="background: #FFFFFF; border-radius: 14px; border-bottom: 5px solid #C9D3E3; box-shadow: 0 1px 0 #FFFFFF inset, 0 24px 48px rgba(15, 42, 90, 0.16), 0 4px 10px rgba(15, 42, 90, 0.08); padding: 24px; display: flex; flex-direction: column; gap: 12px">
+        <span style="width: 40px; height: 40px; border-radius: 10px; background: #0F2A5A; display: inline-flex; align-items: center; justify-content: center" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="8" height="14" rx="2"/><rect x="13" y="5" width="8" height="14" rx="2"/></svg></span>
+        <h3 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 20px; font-weight: 700; color: #0F2A5A">Two agents</h3>
+        <p style="margin: 0; font-size: 14px; color: #1F3A66"><b>Worker</b><br>searches the law in a grade-and-retry loop (agentic RAG), calls tools through a role gate, drafts the assessment</p>
+        <p style="margin: 0; font-size: 14px; color: #1F3A66"><b>Reviser</b><br>takes over after the DPO requests changes: reads the product manager's revised feature and drafts version 2</p>
+      </article>
+      <article style="background: #FFFFFF; border-radius: 14px; border-bottom: 5px solid #C9D3E3; box-shadow: 0 1px 0 #FFFFFF inset, 0 24px 48px rgba(15, 42, 90, 0.16), 0 4px 10px rgba(15, 42, 90, 0.08); padding: 24px; display: flex; flex-direction: column; gap: 12px">
+        <span style="width: 40px; height: 40px; border-radius: 10px; background: #B45309; display: inline-flex; align-items: center; justify-content: center" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>
+        <h3 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 20px; font-weight: 700; color: #0F2A5A">Human in the loop</h3>
+        <p style="margin: 0; font-size: 14px; color: #1F3A66">The agent pauses; the DPO has the last word.</p>
+        <p style="margin: 0; font-size: 14px; color: #1F3A66"><b>Pause</b><br>every full assessment stops at a checkpoint and waits for review</p>
+        <p style="margin: 0; font-size: 14px; color: #1F3A66"><b>Decision</b><br>approve · request changes · reject, after editing severities and wording; the DPO's decision resumes the run</p>
+      </article>
+      <article style="background: #FFFFFF; border-radius: 14px; border-bottom: 5px solid #C9D3E3; box-shadow: 0 1px 0 #FFFFFF inset, 0 24px 48px rgba(15, 42, 90, 0.16), 0 4px 10px rgba(15, 42, 90, 0.08); padding: 24px; display: flex; flex-direction: column; gap: 12px">
+        <span style="width: 40px; height: 40px; border-radius: 10px; background: #0F2A5A; display: inline-flex; align-items: center; justify-content: center" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a7 7 0 0 0-4 12.7V19h8v-3.3A7 7 0 0 0 12 3z"/><path d="M10 22h4"/></svg></span>
+        <h3 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 20px; font-weight: 700; color: #0F2A5A">Memory</h3>
+        <p style="margin: 0; font-size: 14px; color: #1F3A66"><b>Organisation</b><br>facts and lessons from the DPO's rulings, read by the agent at the start of every run; what is remembered is chosen by the DPO, never taken from the feature text</p>
+        <p style="margin: 0; font-size: 14px; color: #1F3A66"><b>Person</b><br>each user's own preferences for future assessments, saved by the user</p>
+      </article>
+      <article style="background: #FFFFFF; border-radius: 14px; border-bottom: 5px solid #C9D3E3; box-shadow: 0 1px 0 #FFFFFF inset, 0 24px 48px rgba(15, 42, 90, 0.16), 0 4px 10px rgba(15, 42, 90, 0.08); padding: 24px; display: flex; flex-direction: column; gap: 12px">
+        <span style="width: 40px; height: 40px; border-radius: 10px; background: #0F2A5A; display: inline-flex; align-items: center; justify-content: center" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l3 3v13H5z"/><path d="M8 11h8M8 15h8"/></svg></span>
+        <h3 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 20px; font-weight: 700; color: #0F2A5A">Processing register</h3>
+        <p style="margin: 0; font-size: 14px; color: #1F3A66"><b>Written on approval only</b><br>the DPO's approval is the one action that creates a record</p>
+        <p style="margin: 0; font-size: 14px; color: #1F3A66"><b>What it holds</b><br>title, verdict, risk level, DPIA, AI Act class, who requested and who approved</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="evaluation" aria-label="Evaluation" style="max-width: 1120px; margin: 0 auto; padding: 64px 24px 0 24px; display: flex; flex-direction: column; gap: 24px">
+    <h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 30px; font-weight: 700; color: #0F2A5A">How well does it work?</h2>
+    <p style="margin: 0; color: #3B4661; max-width: 800px">Seven evaluation sets with 100 synthetic inputs, run against the deployed configuration on 27 October 2026 (retrieval re-run on 3 November). Scored three ways: exact rules against the test data; an AI judge with a rubric, from a model family the app never uses; and a blind human check of five cases.</p>
+    <div class="eval" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 0; border-top: 1px solid #0F2A5A">
+      <div style="padding: 24px 20px 24px 0; border-right: 1px solid #C5CFDF; display: flex; flex-direction: column; gap: 6px">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600; color: #4F6B9A">High-risk AI flag right</div>
+        <div style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 44px; line-height: 1.1; font-weight: 700; color: #1E7A4A">20 of 20</div>
+        <div style="font-size: 14px; color: #3B4661">full assessments over eight legal areas</div>
+      </div>
+      <div style="padding: 24px 20px; border-right: 1px solid #C5CFDF; display: flex; flex-direction: column; gap: 6px">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600; color: #4F6B9A">Dangerous misses</div>
+        <div style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 44px; line-height: 1.1; font-weight: 700; color: #1E7A4A">0</div>
+        <div style="font-size: 14px; color: #3B4661">no case that expected <b>Do not build</b> got <b>Proceed</b></div>
+      </div>
+      <div style="padding: 24px 20px; border-right: 1px solid #C5CFDF; display: flex; flex-direction: column; gap: 6px">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600; color: #4F6B9A">What agentic RAG buys over plain RAG</div>
+        <div style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 44px; line-height: 1.1; font-weight: 700; color: #0F2A5A">+19 % recall</div>
+        <div style="font-size: 14px; color: #3B4661">higher retrieval recall with agentic RAG than with a single retrieval pass</div>
+      </div>
+      <div style="padding: 24px 0 24px 20px; display: flex; flex-direction: column; gap: 6px">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600; color: #4F6B9A">Faithfulness of the full assessment</div>
+        <div style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 44px; line-height: 1.1; font-weight: 700; color: #0F2A5A">0.85</div>
+        <div style="font-size: 14px; color: #3B4661">how far the findings rest on the retrieved law</div>
+      </div>
+    </div>
+    <p style="margin: 0; color: #3B4661; max-width: 800px">Where it falls short: the right finding sometimes sits one severity step too high or too low, and the verdict field is stricter than the findings beneath it. <a href="https://compliance-web-qo1l.onrender.com/evaluation" target="_blank" rel="noreferrer">Read the full report</a>.</p>
+  </section>
+
+  <section id="trust" aria-label="Compliant and secure" style="background: #0F2A5A; color: #FFFFFF; margin-top: 64px; padding: 56px 0 64px 0">
+    <div style="max-width: 1120px; margin: 0 auto; padding: 0 24px; display: flex; flex-direction: column; gap: 28px">
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 30px; font-weight: 700">Compliant and secure</h2>
+        <p style="margin: 0; color: #C9D6F2; max-width: 800px">A compliance tool has to practise what it checks. Every statement below can be verified in the public repository: the code, the model configuration and the gateway's documents and settings saved as evidence.</p>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 24px">
+        <article style="background: #FFFFFF; color: #14213D; border-radius: 14px; padding: 24px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 1px 0 #FFFFFF inset, 0 24px 50px rgba(0, 0, 0, 0.4), 0 6px 14px rgba(0, 0, 0, 0.25)">
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #4F6B9A">01</div>
+          <h3 style="margin: 0; font-size: 17px; font-weight: 700; color: #0F2A5A">Personal data never reaches a model</h3>
+          <p style="margin: 0; color: #3B4661; font-size: 14px">The input screen redacts e-mail addresses, phone numbers, bank account and card numbers before any model call.</p>
+        </article>
+        <article style="background: #FFFFFF; color: #14213D; border-radius: 14px; padding: 24px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 1px 0 #FFFFFF inset, 0 24px 50px rgba(0, 0, 0, 0.4), 0 6px 14px rgba(0, 0, 0, 0.25)">
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #4F6B9A">02</div>
+          <h3 style="margin: 0; font-size: 17px; font-weight: 700; color: #0F2A5A">Zero data retention at the model providers</h3>
+          <p style="margin: 0; color: #3B4661; font-size: 14px">The gateway account allows only zero-retention endpoints and no training on requests, and every request carries that policy itself; a reranker that could not meet it was replaced.</p>
+        </article>
+        <article style="background: #FFFFFF; color: #14213D; border-radius: 14px; padding: 24px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 1px 0 #FFFFFF inset, 0 24px 50px rgba(0, 0, 0, 0.4), 0 6px 14px rgba(0, 0, 0, 0.25)">
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #4F6B9A">03</div>
+          <h3 style="margin: 0; font-size: 17px; font-weight: 700; color: #0F2A5A">Data stays in the EU, and not for long</h3>
+          <p style="margin: 0; color: #3B4661; font-size: 14px">The database is hosted in Frankfurt. Conversations and their saved state are deleted after 30 days by a scheduled job, and a person can have their data deleted on request.</p>
+        </article>
+        <article style="background: #FFFFFF; color: #14213D; border-radius: 14px; padding: 24px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 1px 0 #FFFFFF inset, 0 24px 50px rgba(0, 0, 0, 0.4), 0 6px 14px rgba(0, 0, 0, 0.25)">
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #4F6B9A">04</div>
+          <h3 style="margin: 0; font-size: 17px; font-weight: 700; color: #0F2A5A">Roles and a tool gate</h3>
+          <p style="margin: 0; color: #3B4661; font-size: 14px">Product manager and DPO see different screens and the agent may call only the tools the signed-in role allows.</p>
+        </article>
+        <article style="background: #FFFFFF; color: #14213D; border-radius: 14px; padding: 24px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 1px 0 #FFFFFF inset, 0 24px 50px rgba(0, 0, 0, 0.4), 0 6px 14px rgba(0, 0, 0, 0.25)">
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #4F6B9A">05</div>
+          <h3 style="margin: 0; font-size: 17px; font-weight: 700; color: #0F2A5A">Guardrails on the way in and out</h3>
+          <p style="margin: 0; color: #3B4661; font-size: 14px">Prompt injections and off-topic text are refused at the door; every citation in a draft is checked against the law's text, the output gets a disclaimer, and the evaluation caught 14 of 14 planted inputs.</p>
+        </article>
+        <article style="background: #FFFFFF; color: #14213D; border-radius: 14px; padding: 24px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 1px 0 #FFFFFF inset, 0 24px 50px rgba(0, 0, 0, 0.4), 0 6px 14px rgba(0, 0, 0, 0.25)">
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #4F6B9A">06</div>
+          <h3 style="margin: 0; font-size: 17px; font-weight: 700; color: #0F2A5A">Secure sign-in and a public privacy notice</h3>
+          <p style="margin: 0; color: #3B4661; font-size: 14px">Sign-in through Google with PKCE and a signed eight-hour session. The privacy notice, public in the app, says what is collected, where it goes and how to ask for deletion.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="stack" aria-label="Under the hood" style="max-width: 1120px; margin: 0 auto; padding: 56px 24px 64px 24px; display: flex; flex-direction: column; gap: 20px">
+    <h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 30px; font-weight: 700; color: #0F2A5A">Under the hood</h2>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px">
+      <span style="padding: 8px 14px; border-radius: 999px; background: #FFFFFF; box-shadow: 0 4px 12px rgba(15, 42, 90, 0.10); font-size: 14px; font-weight: 500">Python 3.12</span>
+      <span style="padding: 8px 14px; border-radius: 999px; background: #FFFFFF; box-shadow: 0 4px 12px rgba(15, 42, 90, 0.10); font-size: 14px; font-weight: 500">LangGraph</span>
+      <span style="padding: 8px 14px; border-radius: 999px; background: #FFFFFF; box-shadow: 0 4px 12px rgba(15, 42, 90, 0.10); font-size: 14px; font-weight: 500">LangChain</span>
+      <span style="padding: 8px 14px; border-radius: 999px; background: #FFFFFF; box-shadow: 0 4px 12px rgba(15, 42, 90, 0.10); font-size: 14px; font-weight: 500">FastAPI</span>
+      <span style="padding: 8px 14px; border-radius: 999px; background: #FFFFFF; box-shadow: 0 4px 12px rgba(15, 42, 90, 0.10); font-size: 14px; font-weight: 500">PostgreSQL + pgvector</span>
+      <span style="padding: 8px 14px; border-radius: 999px; background: #FFFFFF; box-shadow: 0 4px 12px rgba(15, 42, 90, 0.10); font-size: 14px; font-weight: 500">Next.js + React + TypeScript</span>
+      <span style="padding: 8px 14px; border-radius: 999px; background: #FFFFFF; box-shadow: 0 4px 12px rgba(15, 42, 90, 0.10); font-size: 14px; font-weight: 500">OpenRouter</span>
+      <span style="padding: 8px 14px; border-radius: 999px; background: #FFFFFF; box-shadow: 0 4px 12px rgba(15, 42, 90, 0.10); font-size: 14px; font-weight: 500">Google sign-in (OIDC)</span>
+      <span style="padding: 8px 14px; border-radius: 999px; background: #FFFFFF; box-shadow: 0 4px 12px rgba(15, 42, 90, 0.10); font-size: 14px; font-weight: 500">Docker</span>
+      <span style="padding: 8px 14px; border-radius: 999px; background: #FFFFFF; box-shadow: 0 4px 12px rgba(15, 42, 90, 0.10); font-size: 14px; font-weight: 500">Render + Neon</span>
+      <span style="padding: 8px 14px; border-radius: 999px; background: #FFFFFF; box-shadow: 0 4px 12px rgba(15, 42, 90, 0.10); font-size: 14px; font-weight: 500">GitHub Actions</span>
+      <span style="padding: 8px 14px; border-radius: 999px; background: #FFFFFF; box-shadow: 0 4px 12px rgba(15, 42, 90, 0.10); font-size: 14px; font-weight: 500">78 automated tests</span>
+    </div>
+    <article style="background: #FFFFFF; border-radius: 14px; border-bottom: 5px solid #C9D3E3; box-shadow: 0 1px 0 #FFFFFF inset, 0 24px 48px rgba(15, 42, 90, 0.16), 0 4px 10px rgba(15, 42, 90, 0.08); padding: 24px; display: flex; flex-direction: column; gap: 12px">
+      <h3 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 20px; font-weight: 700; color: #0F2A5A">Models</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 10px">
+        <div style="background: #F1F4F9; border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px"><b style="font-size: 14px">LLMs</b><span style="font-size: 13px; color: #3B4661">GPT-6 Luna (OpenAI) for assessments, quick answers and the retrieval grader; Gemini 3.1 Flash Lite (Google) for input screening, query rewrites, summaries and re-ranking</span></div>
+        <div style="background: #F1F4F9; border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px"><b style="font-size: 14px">Embedding model</b><span style="font-size: 13px; color: #3B4661">text-embedding-3-small (OpenAI), 1,536 dimensions, stored in pgvector</span></div>
+        <div style="background: #F1F4F9; border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px"><b style="font-size: 14px">Classification model</b><span style="font-size: 13px; color: #3B4661">TypeSafe Jev Router routes each request: quick answer, full assessment or reject</span></div>
+      </div>
+    </article>
+    <p style="margin: 0; color: #3B4661; max-width: 800px">Hybrid retrieval over the two regulations (vector and keyword search, fused, then re-ranked), a tool gate that limits what each role may call, a checkpointer that makes the human pause durable, and long-term memory in the same database. The <a href="https://github.com/aishwaryamuralikrishnan/Compliance_Assessment_Agent" target="_blank" rel="noreferrer">repository</a> has the technical design, the UI notes, the evaluation method and the compliance evidence.</p>
+  </section>
+
+  <footer style="background: #0B1A3A; color: #E6EBF5">
+    <div style="max-width: 1120px; margin: 0 auto; padding: 40px 24px 0 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: 40px">
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <p style="margin: 0; padding-top: 6px; color: #C3CBDD; font-size: 15px; line-height: 1.5">The agent, the API, the web app, the evaluation and the deployment are the author's own work; the laws are the GDPR and the EU AI Act as published in the Official Journal.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600; color: #9DB8F0; line-height: 1.2; padding-top: 6px">Project</div>
+        <div style="display: flex; flex-direction: column; gap: 8px; font-size: 15px">
+          <a href="https://github.com/aishwaryamuralikrishnan/Compliance_Assessment_Agent" target="_blank" rel="noreferrer" style="color: #FFFFFF; text-decoration: underline; line-height: 24px">Project repository</a>
+          <a href="https://compliance-web-qo1l.onrender.com/login" target="_blank" rel="noreferrer" style="color: #FFFFFF; text-decoration: underline; line-height: 24px">Try the demo · sign in with Google</a>
+          <a href="https://compliance-web-qo1l.onrender.com/evaluation" target="_blank" rel="noreferrer" style="color: #FFFFFF; text-decoration: underline; line-height: 24px">Evaluation report</a>
+          <a href="https://compliance-web-qo1l.onrender.com/privacy" target="_blank" rel="noreferrer" style="color: #FFFFFF; text-decoration: underline; line-height: 24px">Privacy notice of the demo</a>
+        </div>
+      </div>
+    </div>
+    <div style="max-width: 1120px; margin: 0 auto; padding: 24px 24px 24px 24px">
+      <div style="padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.16); display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; color: #C3CBDD; font-size: 13px">
+        <p style="margin: 0">Built by Aishwarya Murali Krishnan as the capstone project of the Turing College AI engineering programme, 2026.</p>
+        <a href="https://www.linkedin.com/in/aishwarya-murali-krishnan-354b44198" target="_blank" rel="noreferrer" style="color: #FFFFFF; text-decoration: underline; line-height: 24px">LinkedIn profile</a>
+        <a href="https://github.com/aishwaryamuralikrishnan/aishwaryamuralikrishnan" target="_blank" rel="noreferrer" style="color: #FFFFFF; text-decoration: underline; line-height: 24px">GitHub profile</a>
+      </div>
+    </div>
+  </footer>
+</div>
+</body>
+</html>

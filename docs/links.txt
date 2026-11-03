@@ -1,0 +1,39 @@
+Compliance Assistant · important links
+=======================================
+Kept by hand. Update the Vercel line once the website is deployed (step 5 of the Vercel steps).
+
+WEBSITE (portfolio page, static, Vercel)
+  Website ................... https://<fill in after deploy>.vercel.app
+  Source of the page ........ site/index.html in the public repository (images in site/images/)
+  Design canvas (Claude) .... https://claude.ai/artifact/EBdrFG1BwQFc8GV3858Nzo   (private until shared from its Share menu)
+
+THE APP (Render, free tier; sleeps after 15 minutes without visitors, wakes in up to a minute)
+  Web app ................... https://compliance-web-qo1l.onrender.com
+  Sign in ................... https://compliance-web-qo1l.onrender.com/login
+  Evaluation report ......... https://compliance-web-qo1l.onrender.com/evaluation
+  Privacy notice ............ https://compliance-web-qo1l.onrender.com/privacy
+  API ....................... https://compliance-api-tt5r.onrender.com
+  API health check .......... https://compliance-api-tt5r.onrender.com/api/healthz
+  Evaluation report (JSON) .. https://compliance-api-tt5r.onrender.com/api/eval/report
+
+CODE
+  Public repository (deploy source, portfolio) ... https://github.com/aishwaryamuralikrishnan/Compliance_Assessment_Agent
+  Turing College capstone repository ............ https://github.com/TuringCollegeSubmissions/amural-AE.CAP.AFA.1.1
+  GitHub Actions (retention job, daily 03:17 UTC) https://github.com/aishwaryamuralikrishnan/Compliance_Assessment_Agent/actions
+  Issues (contact route named in the privacy notice) https://github.com/aishwaryamuralikrishnan/Compliance_Assessment_Agent/issues
+
+SERVICES (dashboards; sign in with your own account)
+  Render (compliance-web, compliance-api) ... https://dashboard.render.com
+  Neon (Postgres, Frankfurt) ................ https://console.neon.tech
+  Vercel (the website) ...................... https://vercel.com/dashboard
+  OpenRouter (API key, credits, data policy)  https://openrouter.ai/settings
+  Google Cloud console (OAuth client "Compliance Assistant") https://console.cloud.google.com/auth/clients
+
+PROFILE
+  LinkedIn .................. https://www.linkedin.com/in/aishwarya-murali-krishnan-354b44198
+  GitHub profile ............ https://github.com/aishwaryamuralikrishnan/aishwaryamuralikrishnan
+
+WHERE EACH LINK IS USED
+  README and the Turing showcase ... the website (Vercel) first, then the web app (Render) and the public repository
+  The website ...................... links to the web app, the evaluation report, the privacy notice, the repository, LinkedIn and GitHub
+  The privacy notice in the app .... links to the repository and its issues page
